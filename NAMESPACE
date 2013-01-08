@@ -1,0 +1,4 @@
+export(make.RV)
+export(mult)
+export(multN)
+export(probs)

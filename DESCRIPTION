@@ -1,0 +1,12 @@
+Package: MakeRV
+Maintainer: Eric Hare <erichare@iastate.edu>
+Author: erichare
+Version: 1.0
+License: GPL-3
+Title: MakeRV
+Description: Functions to help create random variables
+Suggests:
+    testthat,
+    roxygen2
+Collate:
+    'MakeRV-package.r'
