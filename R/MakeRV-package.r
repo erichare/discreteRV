@@ -85,3 +85,189 @@ multN <- function(X, n=2, digits=30, scipen=20) {
   return(S)
 }
 
+#' Turn a probability vector with possible outcome values in the 'names()' attribute
+#' into a random variable:
+#'
+#' @param px A probability vector with possible outcome values in the 'names()' attribute
+#' @export
+as.RV <- function(px) {
+    X <- as.numeric(names(px))
+    names(X) <- px
+    class(X) <- "RV"
+    X
+}
+
+#' Calculate probabilitiess of events; expects :
+#'
+#' @param event A logical vector, with names equal to the probabilities
+#' @export
+P <- function(event) { sum(probs(event)[event]) }
+
+#' Expected value of a random variable
+#' 
+#' @param X random variable
+#' @export
+#' @examples
+#' fair.die <- make.RV(1:6, rep("1/6",6))
+#' E(fair.die)
+E <- function(X) { sum(X*probs(X)) }
+
+#' Variance of a random variable
+#' 
+#' @param X random variable
+#' @export
+#' @examples
+#' fair.die <- make.RV(1:6, rep("1/6",6))
+#' V(fair.die)
+V <- function(X) { E((X-E(X))^2) }
+
+#' Standard deviation of a random variable
+#' 
+#' @param X random variable
+#' @export
+#' @examples
+#' fair.die <- make.RV(1:6, rep("1/6",6))
+#' SD(fair.die)
+SD <- function(X) { sqrt(V(X)) }
+
+#' Skewness of a random variable
+#' 
+#' @param X random variable
+#' @export
+#' @examples
+#' fair.die <- make.RV(1:6, rep("1/6",6))
+#' SKEW(fair.die)
+SKEW <- function(X) { E((X-E(X))^3)/SD(X)^3 }
+
+#' Kurtosis of a random variable
+#'
+#' @param X random variable
+#' @export
+#' @examples
+#' fair.die <- make.RV(1:6, rep("1/6",6))
+#' KURT(fair.die)
+KURT <- function(X) { E((X-E(X))^4)/V(X)^2 }
+
+#' Sum of independent random variables
+#' 
+#' @param ... Arbitrary number of random variables
+#' @param digits number of digits of precision used in the calculation. By defualt set to 15. 
+#' @param scipen A penalty to be applied when deciding to print numeric values in fixed or exponential notation. Positive values bias towards fixed and negative towards scientific notation: fixed notation will be preferred unless it is more than scipen digits wider
+#' @export
+#' @examples
+#' fair.die <- make.RV(1:6, rep("1/6",6))
+#' fair.coin <- make.RV(1:2, rep("1/2", 2))
+#' SofI(fair.die, fair.coin)
+SofI <- function(..., digits=15, scipen=10) {
+    LIST <- list(...)
+    S <- LIST[[1]]
+    LIST <- LIST[-1]
+    while(length(LIST)>0) {
+        X <- LIST[[1]]
+        tmp <- tapply(outer(probs(S), probs(X), FUN="*"),
+                      outer(S,        X,        FUN="+"), sum)
+        S <- as.numeric(names(tmp))  
+        options(digits=digits, scipen=scipen) 
+        names(S) <- format(tmp)
+        LIST <- LIST[-1]
+    }
+    class(S) <- "RV"
+    return(S)
+}
+
+#' Sum of independent identically distributed random variables
+#' 
+#' @param X A random variable
+#' @param n The number of Xs to sum
+#' @param digits number of digits of precision used in the calculation. By defualt set to 15. 
+#' @param scipen A penalty to be applied when deciding to print numeric values in fixed or exponential notation. Positive values bias towards fixed and negative towards scientific notation: fixed notation will be preferred unless it is more than scipen digits wider
+#' @export
+#' @examples
+#' fair.die <- make.RV(1:6, rep("1/6",6))
+#' SofIID(fair.die, n=3)
+SofIID <- function(X, n=2, digits=15, scipen=10) {
+    S <- X;  i <- 2
+    while(i<=n) {
+        tmp <- tapply(outer(probs(S), probs(X), FUN="*"),
+                      outer(S,        X,        FUN="+"), sum)
+        S <- as.numeric(names(tmp))  
+        options(digits=digits, scipen=scipen) 
+        names(S) <- format(tmp)
+        if(i%%100==0) cat(i,"... ")
+        i <- i+1
+    };   cat("\n")
+    class(S) <- "RV"
+    return(S)
+}
+
+#' Plot a random variable of class "RV"
+#' 
+#' @method plot RV
+#' @param x A random variable
+#' @param ... Additional arguments to be passed to the "plot" function
+#' @param pch Either an integer specifying a symbol or a single character to be used as the default in plotting points.
+#' @param cex A numerical value giving the amount by which plotting text and symbols should be magnified relative to the default.
+#' @param lwd The line width, a positive number, defaulting to 2.
+#' @param col A specification for the default plotting color
+#' @param stretch.x A numeric by which to extend the x axis limits
+#' @param stretch.y A numeric by which to extend the y axis limits
+#' @param xlab Label for the X axis
+#' @param ylab Label for the Y axis
+#' @param xlim Lower and upper limit for the x axis
+#' @param ylim Lower and upper limit for the y axis
+#' @export
+#' @examples
+#' fair.die <- make.RV(1:6, rep("1/6",6))
+#' plot(fair.die)
+plot.RV <- function(x, ..., pch=16, cex=1.2, lwd=2, col="black",
+                    stretch.x=1.2, stretch.y=1.2,
+                    xlab="Possible Values",
+                    ylab="Probabilities",
+                    xlim=mean(range(x)) + (range(x)-mean(range(x)))*stretch.x,
+                    ylim=c(0, max(probs(x))*stretch.y)) {
+    ## args <- list(...);  print(args)
+    xx <- as.numeric(x)
+    px <- probs(x)
+    plot(xx, px, type="h", lwd=lwd, col=col, xlab=xlab, ylab=ylab, xlim=xlim, ylim=ylim, ...)
+    abline(h=0, col="gray")
+    points(xx, px, pch=pch, cex=cex, col=col)
+}
+
+#' Print a random variable of class "RV"
+#' 
+#' @method print RV
+#' @param x A random variable
+#' @param ... Additional arguments to be passed to the "print" function
+#' @export
+#' @examples
+#' fair.die <- make.RV(1:6, rep("1/6",6))
+#' print(fair.die)
+print.RV <- function(x, ...) {
+    attributes(x)$class <- NULL
+    print(x, ...)
+}
+
+#' Normal quantile plot for RVs to answer the question how close to normal it is
+#'
+#' @method qqnorm RV
+#' @param y A random variable
+#' @param ... Additional arguments to be passed to the "plot" or "points" function
+#' @param pch Either an integer specifying a symbol or a single character to be used as the default in plotting points.
+#' @param cex A numerical value giving the amount by which plotting text and symbols should be magnified relative to the default.
+#' @param add A logical indicating whether to add to an existing plot
+#' @param xlab Label for the X axis
+#' @param ylab Label for the Y axis
+#' @export
+#' @examples
+#' fair.die <- make.RV(1:6, rep("1/6",6))
+#' qqnorm(fair.die)
+qqnorm.RV <- function(y, ..., pch=16, cex=.5, add=FALSE, 
+                      xlab="Normal Quantiles", ylab="Random Variable Quantiles") {
+    y <- sort(y[probs(y)>0])
+    pc <- cumsum(probs(y))
+    if(!add) {
+        plot(qnorm(pc), y, pch=pch, cex=cex, xlab=xlab, ylab=ylab, ...)
+    } else {
+        points(qnorm(pc), y, pch=pch, cex=cex, ...)
+    }
+}
