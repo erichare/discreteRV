@@ -44,15 +44,42 @@ props <- function(...) { LIST <- list(...)
                          tbl
 }
 
-# Proportion of an event observed in a vector of simulated trials:
+#' Proportion of an event observed in a vector of simulated trials
+#'
+#' @param X.sim A simulated data vector produced with the 'rsim()' function
+#' @export
+#' @examples
+#' X <- make.RV(c(100000,10000,0), c(0.00025,0.005,0.99475))
+#' X.sim <- rsim(200000, X)
+#' 
+#' Prop(X.sim>0)
+#' Prop(X.sim==100000)
+#' Prop(X.sim==2000)
 Prop <- function(X.sim) { sum(X.sim)/length(X.sim) }  
 
-# Otherwise use the empirical functions
-# mean(X.sim); var(X.sim); sd(X.sim); and the empirical skewness:
-skew <- function(X.sim) { mean(scale(X.sim)^3) }
+#' Skew of the empirical distribution of simulated data
+#'
+#' @param X.sim A simulated data vector produced with the 'rsim()' function
+#' @export
+#' @examples
+#' X <- make.RV(c(100000,10000,0), c(0.00025,0.005,0.99475))
+#' X.sim <- rsim(200000, X)
+#' 
+#' skewSim(X.sim)
+skewSim <- function(X.sim) { mean(scale(X.sim)^3) }
 
-# Plot simulations like a random variable:
-plot.RVsim <- function(Xsim, ...) {
-    X <- as.RV(props(Xsim))
+#' Plot a simulated random vector
+#' 
+#' @method plot RVsim
+#' @param x A simulated data vector produced with the 'rsim()' function
+#' @param ... Additional arguments to  be passed to the 'plot()' function
+#' @export
+#' @examples
+#' X <- make.RV(c(100000,10000,0), c(0.00025,0.005,0.99475))
+#' X.sim <- rsim(200000, X)
+#' 
+#' plot(X.sim)
+plot.RVsim <- function(x, ...) {
+    X <- as.RV(props(x))
     plot(X, ylab="Proportions", ...)
 }
