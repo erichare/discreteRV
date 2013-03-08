@@ -9,4 +9,5 @@ Suggests:
     testthat,
     roxygen2
 Collate:
-    'MakeRV-package.r'
+    'MakeRV-Probabilities.r'
+    'MakeRV-Simulations.r'

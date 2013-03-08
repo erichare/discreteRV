@@ -23,7 +23,9 @@
   variables
 }
 \examples{
-fair.die <- make.RV(1:6, rep("1/6",6))
-SofIID(fair.die, n=3)
+X.Bern <- make.RV(c(1,0), c(.5,.5))
+
+S5 <- SofIID(X.Bern, 5)
+S128 <- SofIID(X.Bern, 128)
 }
 

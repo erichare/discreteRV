@@ -11,7 +11,7 @@
   Variance of a random variable
 }
 \examples{
-fair.die <- make.RV(1:6, rep("1/6",6))
-V(fair.die)
+X.Bern <- make.RV(c(1,0), c(.5,.5))
+E(X.Bern)
 }
 

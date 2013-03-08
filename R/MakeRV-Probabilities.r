@@ -9,7 +9,20 @@
 #' @return random variable as RV object.
 #' @export
 #' @examples
-#' fair.die <- make.RV(1:6, rep("1/6",6))
+#' # Make a 50:50 Bernoulli random variable:
+#' X.Bern <- make.RV(c(1,0), c(.5,.5))   
+#'   
+#' # Make a fair coin flip game with payoffs +$1 and -$1:
+#' X.fair.coin <- make.RV(c(1,-1), c(.5,.5))
+#' 
+#' # Make a biased coin flip game with odds 1:2 and with fair payoffs +$2 and -$1
+#' X.biased.coin <- make.RV(c(2,-1), c(1,2))
+#' 
+#' # Make a fair die
+#' X.fair.die <- make.RV(1:6, rep("1/6",6))
+#' 
+#' # Make a loaded die, specifying odds 1:1:1:1:2:4 rather than probabilities:
+#' X.loaded.die <- make.RV(1:6, c(1,1,1,1,2,4))
 make.RV <- function(vals, probs.or.odds) { 
   names(vals) <- probs.or.odds
   class(vals) <- "RV"
@@ -28,8 +41,14 @@ make.RV <- function(vals, probs.or.odds) {
 #' @return named vector of probablities for each element of the random variable
 #' @export
 #' @examples
-#' fair.die <- make.RV(1:6, rep("1/6",6))
-#' probs(fair.die)
+#' X.Bern <- make.RV(c(1,0), c(.5,.5))
+#' probs(X.Bern)
+#' 
+#' X.fair.die <- make.RV(1:6, rep("1/6",6))
+#' probs(X.fair.die)
+#' 
+#' X.loaded.die <- make.RV(1:6, c(1,1,1,1,2,4))
+#' probs(X.loaded.die)
 probs <- function(X, scipen=10, digits=22) { 
   pr <- sapply(names(X), function(pstr) eval(parse(text=pstr)));
   options(scipen=scipen)
@@ -97,10 +116,17 @@ as.RV <- function(px) {
     X
 }
 
-#' Calculate probabilitiess of events; expects :
+#' Calculate probabilities of events
 #'
 #' @param event A logical vector, with names equal to the probabilities
 #' @export
+#' @examples
+#' X.fair.die <- make.RV(1:6, rep("1/6",6))
+#' P(X.fair.die>3)
+#' 
+#' X.loaded.die <- make.RV(1:6, c(1,1,1,1,2,4))
+#' P(X.loaded.die>3)
+#' P(X.loaded.die==6)
 P <- function(event) { sum(probs(event)[event]) }
 
 #' Expected value of a random variable
@@ -108,8 +134,11 @@ P <- function(event) { sum(probs(event)[event]) }
 #' @param X random variable
 #' @export
 #' @examples
-#' fair.die <- make.RV(1:6, rep("1/6",6))
-#' E(fair.die)
+#' X.Bern <- make.RV(c(1,0), c(.5,.5))
+#' E(X.Bern)
+#' 
+#' X.fair.die <- make.RV(1:6, rep("1/6",6))
+#' E(X.fair.die)
 E <- function(X) { sum(X*probs(X)) }
 
 #' Variance of a random variable
@@ -117,8 +146,8 @@ E <- function(X) { sum(X*probs(X)) }
 #' @param X random variable
 #' @export
 #' @examples
-#' fair.die <- make.RV(1:6, rep("1/6",6))
-#' V(fair.die)
+#' X.Bern <- make.RV(c(1,0), c(.5,.5))
+#' E(X.Bern)
 V <- function(X) { E((X-E(X))^2) }
 
 #' Standard deviation of a random variable
@@ -126,8 +155,8 @@ V <- function(X) { E((X-E(X))^2) }
 #' @param X random variable
 #' @export
 #' @examples
-#' fair.die <- make.RV(1:6, rep("1/6",6))
-#' SD(fair.die)
+#' X.Bern <- make.RV(c(1,0), c(.5,.5))
+#' E(X.Bern)
 SD <- function(X) { sqrt(V(X)) }
 
 #' Skewness of a random variable
@@ -135,8 +164,8 @@ SD <- function(X) { sqrt(V(X)) }
 #' @param X random variable
 #' @export
 #' @examples
-#' fair.die <- make.RV(1:6, rep("1/6",6))
-#' SKEW(fair.die)
+#' X.Bern <- make.RV(c(1,0), c(.5,.5))
+#' SKEW(X.Bern)
 SKEW <- function(X) { E((X-E(X))^3)/SD(X)^3 }
 
 #' Kurtosis of a random variable
@@ -144,8 +173,8 @@ SKEW <- function(X) { E((X-E(X))^3)/SD(X)^3 }
 #' @param X random variable
 #' @export
 #' @examples
-#' fair.die <- make.RV(1:6, rep("1/6",6))
-#' KURT(fair.die)
+#' X.Bern <- make.RV(c(1,0), c(.5,.5))
+#' KURT(X.Bern)
 KURT <- function(X) { E((X-E(X))^4)/V(X)^2 }
 
 #' Sum of independent random variables
@@ -155,9 +184,11 @@ KURT <- function(X) { E((X-E(X))^4)/V(X)^2 }
 #' @param scipen A penalty to be applied when deciding to print numeric values in fixed or exponential notation. Positive values bias towards fixed and negative towards scientific notation: fixed notation will be preferred unless it is more than scipen digits wider
 #' @export
 #' @examples
-#' fair.die <- make.RV(1:6, rep("1/6",6))
-#' fair.coin <- make.RV(1:2, rep("1/2", 2))
-#' SofI(fair.die, fair.coin)
+#' X.Bern <- make.RV(c(1,0), c(.5,.5))
+#' X.fair.die <- make.RV(1:6, rep("1/6",6))
+#' 
+#' S5 <- SofI(X.Bern, X.Bern, X.Bern, X.Bern, X.Bern)  
+#' S.mix <- SofI(X.Bern, X.fair.die)  # Independent but not IID
 SofI <- function(..., digits=15, scipen=10) {
     LIST <- list(...)
     S <- LIST[[1]]
@@ -183,8 +214,10 @@ SofI <- function(..., digits=15, scipen=10) {
 #' @param scipen A penalty to be applied when deciding to print numeric values in fixed or exponential notation. Positive values bias towards fixed and negative towards scientific notation: fixed notation will be preferred unless it is more than scipen digits wider
 #' @export
 #' @examples
-#' fair.die <- make.RV(1:6, rep("1/6",6))
-#' SofIID(fair.die, n=3)
+#' X.Bern <- make.RV(c(1,0), c(.5,.5))
+#' 
+#' S5 <- SofIID(X.Bern, 5)
+#' S128 <- SofIID(X.Bern, 128)
 SofIID <- function(X, n=2, digits=15, scipen=10) {
     S <- X;  i <- 2
     while(i<=n) {

@@ -25,7 +25,13 @@
   p(x)
 }
 \examples{
-fair.die <- make.RV(1:6, rep("1/6",6))
-probs(fair.die)
+X.Bern <- make.RV(c(1,0), c(.5,.5))
+probs(X.Bern)
+
+X.fair.die <- make.RV(1:6, rep("1/6",6))
+probs(X.fair.die)
+
+X.loaded.die <- make.RV(1:6, c(1,1,1,1,2,4))
+probs(X.loaded.die)
 }
 
