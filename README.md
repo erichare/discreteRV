@@ -3,7 +3,7 @@
 
 # INSTALLATION
 
-1.Install the R package "devtools" with the following command:
+1. Install the R package "devtools" with the following command:
 
         install.packages("devtools")
 
