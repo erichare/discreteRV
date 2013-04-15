@@ -1,8 +1,7 @@
-### MakeRV
-### ======
-### R Package for easy generation of Random Variables
+## MakeRV
+# R Package for easy generation of Random Variables
 
-## INSTALLATION
+# INSTALLATION
 
 1. Install the R package "devtools" with the following command:
 	install.packages("devtools")
