@@ -1,0 +1,17 @@
+\name{SKEW}
+\alias{SKEW}
+\title{Skewness of a random variable}
+\usage{
+  SKEW(X)
+}
+\arguments{
+  \item{X}{random variable}
+}
+\description{
+  Skewness of a random variable
+}
+\examples{
+X.Bern <- make.RV(c(1,0), c(.5,.5))
+SKEW(X.Bern)
+}
+
