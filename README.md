@@ -7,10 +7,13 @@
 1. Install the R package "devtools" with the following command:
 	install.packages("devtools")
 
-2. Using the install_github function, install MakeRV with the following command:
+2. Load the devtools package with the following command:
+	library(devtools)
+
+3. Using the install_github function, install MakeRV with the following command:
 	install_github("MakeRV", "Raftysworld")
 
-3. Load the library with the following command:
+4. Load the library with the following command:
 	library(MakeRV)
 
-4. You're done!
+5. You're done!
