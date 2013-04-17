@@ -11,7 +11,7 @@
 
         library(devtools)
 
-3. Using the install_github function, install MakeRV with the following command:
+3. Using the install_github function, install discreteRV with the following command:
 
         install_github("discreteRV", "Raftysworld")
 
