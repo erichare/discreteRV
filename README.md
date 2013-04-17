@@ -1,5 +1,5 @@
-## MakeRV
-# R Package for easy generation of Random Variables
+## discreteRV
+# R Package for easy generation of Discrete Random Variables
 
 # INSTALLATION
 
@@ -13,10 +13,10 @@
 
 3. Using the install_github function, install MakeRV with the following command:
 
-        install_github("MakeRV", "Raftysworld")
+        install_github("discreteRV", "Raftysworld")
 
 4. Load the library with the following command:
 
-        library(MakeRV)
+        library(discreteRV)
 
 5. You're done!
