@@ -2,7 +2,7 @@
 \name{make.RV}
 \alias{make.RV}
 \alias{make.RV-package}
-\title{MakeRV}
+\title{Make a random variable consisting of possible outcome values and their probabilities or odds}
 \usage{
   make.RV(vals, probs.or.odds)
 }

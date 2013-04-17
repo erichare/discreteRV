@@ -1,5 +1,3 @@
-#' MakeRV
-#' 
 #' Make a random variable consisting of possible outcome values and their probabilities or odds
 #' 
 #' @name make.RV

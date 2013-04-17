@@ -1,13 +1,13 @@
-Package: MakeRV
+Package: discreteRV
 Maintainer: Eric Hare <erichare@iastate.edu>
 Author: Andreas Buja
 Version: 1.0
 License: GPL-3
-Title: MakeRV
-Description: Functions to help create random variables
+Title: discreteRV
+Description: Functions to create and manipulate discrete random variables
 Suggests:
     testthat,
     roxygen2
 Collate:
-    'MakeRV-Probabilities.r'
-    'MakeRV-Simulations.r'
+    'discreteRV-Probabilities.r'
+    'discreteRV-Simulations.r'
