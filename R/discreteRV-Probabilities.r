@@ -68,10 +68,10 @@ probs <- function(X, scipen=10, digits=22) {
 #' d <- make.RV(c("A","B","C"), c(3,5,11))
 #' d2 <- mult(d,d)
 #' probs(d2)
-mult <- function(X, Y, digits=15, scipen=10) {
+mult <- function(X, Y, digits=15, scipen=10, sep=".") {
   S <- X
   tmp <- tapply(outer(probs(S), probs(Y), FUN="*"),
-                outer(S, Y, FUN="paste", sep=""), paste, sep="")
+                outer(S, Y, FUN="paste", sep=sep), paste, sep=sep)
   S <- as.character(names(tmp))
   names(S) <- as.numeric(tmp)
   class(S) <- "RV"
@@ -89,11 +89,11 @@ mult <- function(X, Y, digits=15, scipen=10) {
 #' d <- make.RV(c("A","B","C"), c(3,5,11))
 #' d2 <- multN(d)
 #' probs(d2)
-multN <- function(X, n=2, digits=30, scipen=20) {
+multN <- function(X, n=2, digits=30, scipen=20, sep=".") {
   S <- X;  i <- 2
   while(i<=n) {
     tmp <- tapply(outer(probs(S), probs(X), FUN="*"),
-                  outer(S, X, FUN="paste", sep=""), paste, sep="")
+                  outer(S, X, FUN="paste", sep=sep), paste, sep=sep)
     S <- as.character(names(tmp))
     names(S) <- as.numeric(tmp)
     i <- i+1
