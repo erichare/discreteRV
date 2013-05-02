@@ -61,8 +61,9 @@ probs <- function(X, scipen=10, digits=22) {
 #'
 #' @param X random variable
 #' @param Y random variable
-#' @param digits number of digits of precision used in the calculation. By defualt set to 15. 
+#' @param digits number of digits of precision used in the calculation. By default set to 15. 
 #' @param scipen A penalty to be applied when deciding to print numeric values in fixed or exponential notation. Positive values bias towards fixed and negative towards scientific notation: fixed notation will be preferred unless it is more than scipen digits wider
+#' @param sep separator between items from marginal distributions, by default set to "."
 #' @export
 #' @examples
 #' d <- make.RV(c("A","B","C"), c(3,5,11))
@@ -82,8 +83,9 @@ mult <- function(X, Y, digits=15, scipen=10, sep=".") {
 #'
 #' @param X random variable
 #' @param n power
-#' @param digits number of digits of precision used in the calculation. By defualt set to 15. 
+#' @param digits number of digits of precision used in the calculation. By default set to 15. 
 #' @param scipen A penalty to be applied when deciding to print numeric values in fixed or exponential notation. Positive values bias towards fixed and negative towards scientific notation: fixed notation will be preferred unless it is more than scipen digits wider
+#' @param sep separator between items from marginal distributions, by default set to "."
 #' @export
 #' @examples
 #' d <- make.RV(c("A","B","C"), c(3,5,11))
