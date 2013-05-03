@@ -304,3 +304,24 @@ qqnorm.RV <- function(y, ..., pch=16, cex=.5, add=FALSE,
         points(qnorm(pc), y, pch=pch, cex=cex, ...)
     }
 }
+
+#' Marginal distribution of a joint random variable
+#'
+#' Extracts the marginal probability mass functions from a joint distribution.
+#' @param X a random variable
+#' @param sep parameter specifying the separator between dimensions, defaults to "."
+#' @export
+#' @examples
+#' X <- make.RV(1:6, 1:6)
+#' X3 <- mult(X, 3)
+#' margins(X3)
+margins <- function(X, sep=".") {
+    dframe <- sapply(strsplit(as.character(X), split=sep, fixed=TRUE), function(x) as.matrix(x))
+    
+    require(plyr)
+    res <- alply(dframe, .margins=1, function(x) {
+        dtab <- xtabs(probs(X)~x)
+        make.RV(names(dtab), as.numeric(dtab))
+    })    
+    res
+}
