@@ -1,9 +1,11 @@
 Package: discreteRV
 Maintainer: Eric Hare <erichare@iastate.edu>
-Author: Andreas Buja
-Version: 1.0
+Author: Andreas Buja, Heike Hofmann
+Version: 1.1
 License: GPL-3
 Title: discreteRV
+Depends:
+    plyr
 Description: Functions to create and manipulate discrete random variables
 Suggests:
     testthat,

@@ -313,7 +313,7 @@ qqnorm.RV <- function(y, ..., pch=16, cex=.5, add=FALSE,
 #' @export
 #' @examples
 #' X <- make.RV(1:6, 1:6)
-#' X3 <- mult(X, 3)
+#' X3 <- multN(X, 3)
 #' margins(X3)
 margins <- function(X, sep=".") {
     dframe <- sapply(strsplit(as.character(X), split=sep, fixed=TRUE), function(x) as.matrix(x))
