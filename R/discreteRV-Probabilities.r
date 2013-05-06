@@ -279,7 +279,7 @@ print.RV <- function(x, ...) {
     attributes(x)$class <- NULL
     cat(paste("random variable with", length(x), "outcomes\n\n"))
     
-    df <- data.frame(Outcome = as.numeric(x), Probability = names(x))
+    df <- data.frame(Outcome = x, Probability = names(x))
     print(df, row.names = FALSE, ...)
 }
 
