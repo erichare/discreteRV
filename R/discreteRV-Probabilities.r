@@ -277,7 +277,10 @@ plot.RV <- function(x, ..., pch=16, cex=1.2, lwd=2, col="black",
 #' print(fair.die)
 print.RV <- function(x, ...) {
     attributes(x)$class <- NULL
-    print(x, ...)
+    cat(paste("random variable with", length(x), "outcomes\n\n"))
+    
+    df <- data.frame(Outcome = as.numeric(x), Probability = names(x))
+    print(df, row.names = FALSE, ...)
 }
 
 #' Normal quantile plot for RVs to answer the question how close to normal it is
