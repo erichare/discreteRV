@@ -59,6 +59,7 @@ probs <- function(X, scipen=10, digits=22) {
 
 #' Joint probability mass function of random variables X and Y
 #'
+#' @author Heike Hofmann <hofmann@iastate.edu>
 #' @param X random variable
 #' @param Y random variable
 #' @param digits number of digits of precision used in the calculation. By default set to 15. 
@@ -81,6 +82,7 @@ mult <- function(X, Y, digits=15, scipen=10, sep=".") {
 
 #' Probability mass function of  X^n
 #'
+#' @author Heike Hofmann <hofmann@iastate.edu>
 #' @param X random variable
 #' @param n power
 #' @param digits number of digits of precision used in the calculation. By default set to 15. 
@@ -269,6 +271,7 @@ plot.RV <- function(x, ..., pch=16, cex=1.2, lwd=2, col="black",
 #' Print a random variable of class "RV"
 #' 
 #' @method print RV
+#' @author Eric Hare <erichare@iastate.edu>
 #' @param x A random variable
 #' @param ... Additional arguments to be passed to the "print" function
 #' @export
@@ -279,8 +282,14 @@ print.RV <- function(x, ...) {
     attributes(x)$class <- NULL
     cat(paste("random variable with", length(x), "outcomes\n\n"))
     
-    df <- data.frame(Outcome = x, Probability = names(x))
-    print(df, row.names = FALSE, ...)
+    ## Use a dataframe... nah.
+    #df <- data.frame(Outcome = x, Probability = names(x))
+    #print(df, row.names = FALSE, ...)
+    
+    vec <- names(x)
+    names(vec) <- x
+    
+    print(vec, quote = FALSE, ...)
 }
 
 #' Normal quantile plot for RVs to answer the question how close to normal it is
@@ -311,6 +320,7 @@ qqnorm.RV <- function(y, ..., pch=16, cex=.5, add=FALSE,
 #' Marginal distribution of a joint random variable
 #'
 #' Extracts the marginal probability mass functions from a joint distribution.
+#' @author Heike Hofmann <hofmann@iastate.edu>
 #' @param X a random variable
 #' @param sep parameter specifying the separator between dimensions, defaults to "."
 #' @export
