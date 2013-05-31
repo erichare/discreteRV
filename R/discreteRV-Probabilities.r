@@ -21,10 +21,24 @@
 #' 
 #' # Make a loaded die, specifying odds 1:1:1:1:2:4 rather than probabilities:
 #' X.loaded.die <- make.RV(1:6, c(1,1,1,1,2,4))
-make.RV <- function(vals, probs.or.odds) { 
-  names(vals) <- probs.or.odds
-  class(vals) <- "RV"
-  vals 
+make.RV <- function(vals, probs.or.odds) {
+    ## Check if odds or probs
+    pr <- sapply(probs.or.odds, function(pstr) eval(parse(text=pstr)));
+    
+    probsSum <- sum(pr)
+    isOdds <- probsSum > 1
+    
+    if (length(vals) < length(probs.or.odds)) {
+        stop("More probabilities/odds than outcomes provided")
+    } else if (length(vals) > length(probs.or.odds)) {
+        warning("Some outcomes have no probabilities or odds specified: Defaulting to uniform")
+        
+        probs.or.odds <- c(probs.or.odds, rep(ifelse(isOdds, 1, (1 - probsSum) / (length(vals) - length(probs.or.odds))), length(vals) - length(probs.or.odds)))
+    }
+    
+    names(vals) <- probs.or.odds
+    class(vals) <- "RV"
+    vals 
 } 
 
 
@@ -48,12 +62,12 @@ make.RV <- function(vals, probs.or.odds) {
 #' X.loaded.die <- make.RV(1:6, c(1,1,1,1,2,4))
 #' probs(X.loaded.die)
 probs <- function(X, scipen=10, digits=22) { 
-  pr <- sapply(names(X), function(pstr) eval(parse(text=pstr)));
-  options(scipen=scipen)
-  names(pr) <- X
-  pr <- pmax(pr,0)
-  if(any(is.na(pr))) pr[is.na(pr)] <- pmax(0, (1-sum(pr[!is.na(pr)]))/sum(is.na(pr)))
-  pr/sum(pr) 
+    pr <- sapply(names(X), function(pstr) eval(parse(text=pstr)));
+    options(scipen=scipen)
+    names(pr) <- X
+    pr <- pmax(pr,0)
+    if(any(is.na(pr))) pr[is.na(pr)] <- pmax(0, (1-sum(pr[!is.na(pr)]))/sum(is.na(pr)))
+    pr/sum(pr) 
 }
 
 
@@ -71,13 +85,13 @@ probs <- function(X, scipen=10, digits=22) {
 #' d2 <- mult(d,d)
 #' probs(d2)
 mult <- function(X, Y, digits=15, scipen=10, sep=".") {
-  S <- X
-  tmp <- tapply(outer(probs(S), probs(Y), FUN="*"),
-                outer(S, Y, FUN="paste", sep=sep), paste, sep=sep)
-  S <- as.character(names(tmp))
-  names(S) <- as.numeric(tmp)
-  class(S) <- "RV"
-  return(S)
+    S <- X
+    tmp <- tapply(outer(probs(S), probs(Y), FUN="*"),
+                  outer(S, Y, FUN="paste", sep=sep), paste, sep=sep)
+    S <- as.character(names(tmp))
+    names(S) <- as.numeric(tmp)
+    class(S) <- "RV"
+    return(S)
 }
 
 #' Probability mass function of  X^n
@@ -94,16 +108,16 @@ mult <- function(X, Y, digits=15, scipen=10, sep=".") {
 #' d2 <- multN(d)
 #' probs(d2)
 multN <- function(X, n=2, digits=30, scipen=20, sep=".") {
-  S <- X;  i <- 2
-  while(i<=n) {
-    tmp <- tapply(outer(probs(S), probs(X), FUN="*"),
-                  outer(S, X, FUN="paste", sep=sep), paste, sep=sep)
-    S <- as.character(names(tmp))
-    names(S) <- as.numeric(tmp)
-    i <- i+1
-  }
-  class(S) <- "RV"
-  return(S)
+    S <- X;  i <- 2
+    while(i<=n) {
+        tmp <- tapply(outer(probs(S), probs(X), FUN="*"),
+                      outer(S, X, FUN="paste", sep=sep), paste, sep=sep)
+        S <- as.character(names(tmp))
+        names(S) <- as.numeric(tmp)
+        i <- i+1
+    }
+    class(S) <- "RV"
+    return(S)
 }
 
 #' Turn a probability vector with possible outcome values in the 'names()' attribute
