@@ -2,7 +2,8 @@
 \alias{SofIID}
 \title{Sum of independent identically distributed random variables}
 \usage{
-  SofIID(X, n = 2, digits = 15, scipen = 10)
+  SofIID(X, n = 2, digits = 15, scipen = 10,
+    progress = TRUE)
 }
 \arguments{
   \item{X}{A random variable}
@@ -17,6 +18,8 @@
   Positive values bias towards fixed and negative towards
   scientific notation: fixed notation will be preferred
   unless it is more than scipen digits wider}
+
+  \item{progress}{If TRUE, display a progress bar}
 }
 \description{
   Sum of independent identically distributed random

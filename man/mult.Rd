@@ -30,4 +30,7 @@ d <- make.RV(c("A","B","C"), c(3,5,11))
 d2 <- mult(d,d)
 probs(d2)
 }
+\author{
+  Heike Hofmann \email{hofmann@iastate.edu}
+}
 

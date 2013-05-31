@@ -19,4 +19,7 @@ X <- make.RV(1:6, 1:6)
 X3 <- multN(X, 3)
 margins(X3)
 }
+\author{
+  Heike Hofmann \email{hofmann@iastate.edu}
+}
 

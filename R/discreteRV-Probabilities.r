@@ -73,7 +73,7 @@ probs <- function(X, scipen=10, digits=22) {
 
 #' Joint probability mass function of random variables X and Y
 #'
-#' @author Heike Hofmann <hofmann@iastate.edu>
+#' @author Heike Hofmann \email{hofmann@@iastate.edu}
 #' @param X random variable
 #' @param Y random variable
 #' @param digits number of digits of precision used in the calculation. By default set to 15. 
@@ -96,7 +96,7 @@ mult <- function(X, Y, digits=15, scipen=10, sep=".") {
 
 #' Probability mass function of  X^n
 #'
-#' @author Heike Hofmann <hofmann@iastate.edu>
+#' @author Heike Hofmann \email{hofmann@@iastate.edu}
 #' @param X random variable
 #' @param n power
 #' @param digits number of digits of precision used in the calculation. By default set to 15. 
@@ -228,23 +228,27 @@ SofI <- function(..., digits=15, scipen=10) {
 #' @param n The number of Xs to sum
 #' @param digits number of digits of precision used in the calculation. By defualt set to 15. 
 #' @param scipen A penalty to be applied when deciding to print numeric values in fixed or exponential notation. Positive values bias towards fixed and negative towards scientific notation: fixed notation will be preferred unless it is more than scipen digits wider
+#' @param progress If TRUE, display a progress bar
 #' @export
 #' @examples
 #' X.Bern <- make.RV(c(1,0), c(.5,.5))
 #' 
 #' S5 <- SofIID(X.Bern, 5)
 #' S128 <- SofIID(X.Bern, 128)
-SofIID <- function(X, n=2, digits=15, scipen=10) {
+SofIID <- function(X, n=2, digits=15, scipen=10, progress=TRUE) {
     S <- X;  i <- 2
+    pb <- txtProgressBar(min = 1, max = n)
     while(i<=n) {
         tmp <- tapply(outer(probs(S), probs(X), FUN="*"),
                       outer(S,        X,        FUN="+"), sum)
         S <- as.numeric(names(tmp))  
         options(digits=digits, scipen=scipen) 
         names(S) <- format(tmp)
-        if(i%%100==0) cat(i,"... ")
+        if(i%%100==0 & progress) setTxtProgressBar(pb, i)
         i <- i+1
-    };   cat("\n")
+    };
+    close(pb)
+    
     class(S) <- "RV"
     return(S)
 }
@@ -285,7 +289,7 @@ plot.RV <- function(x, ..., pch=16, cex=1.2, lwd=2, col="black",
 #' Print a random variable of class "RV"
 #' 
 #' @method print RV
-#' @author Eric Hare <erichare@iastate.edu>
+#' @author Eric Hare \email{erichare@@iastate.edu}
 #' @param x A random variable
 #' @param ... Additional arguments to be passed to the "print" function
 #' @export
@@ -334,7 +338,7 @@ qqnorm.RV <- function(y, ..., pch=16, cex=.5, add=FALSE,
 #' Marginal distribution of a joint random variable
 #'
 #' Extracts the marginal probability mass functions from a joint distribution.
-#' @author Heike Hofmann <hofmann@iastate.edu>
+#' @author Heike Hofmann \email{hofmann@@iastate.edu}
 #' @param X a random variable
 #' @param sep parameter specifying the separator between dimensions, defaults to "."
 #' @export
