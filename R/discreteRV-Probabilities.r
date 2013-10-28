@@ -120,38 +120,6 @@ multN <- function(X, n=2, digits=30, scipen=20, sep=".") {
     return(S)
 }
 
-getChoices <- function(str) {
-    test <- as.numeric(unlist(strsplit(str, split = ",")))
-    
-    left <- sum(test)
-    total <- 1
-    for (i in 1:length(test)) {
-        val <- choose(left, test[i])
-        left <- left - test[i]
-        total <- total * val
-    }
-    
-    return(total)
-}
-
-multN2 <- function(X, n = 2, sep = ".") {
-    num_outcomes <- length(X)
-    
-    str.func <- paste("expand.grid(", paste(rep(paste("0:", n, sep = ""), times = num_outcomes), collapse = ", "), ")")
-    
-    grid.df <- eval(parse(text = str.func))
-    grid.sub <- subset(grid.df, apply(grid.df, 1, sum) == n)
-    
-    grid.str <- apply(grid.sub, 1, paste, collapse = ",")
-    grid.list <- split(grid.sub, 1:nrow(grid.sub))
-    grid.prob <- lapply(grid.list, function(x) {
-        prod(probs(X)^x)
-    })
-    
-    grid.choices <- lapply(grid.str, getChoices)
-    data.frame(Encoding = as.character(grid.str), Prob = as.numeric(grid.prob), Choices = as.numeric(grid.choices))
-}
-
 #' Turn a probability vector with possible outcome values in the 'names()' attribute
 #' into a random variable:
 #'
