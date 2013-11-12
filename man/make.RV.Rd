@@ -4,12 +4,15 @@
 \alias{make.RV-package}
 \title{Make a random variable consisting of possible outcome values and their probabilities or odds}
 \usage{
-  make.RV(vals, probs.or.odds)
+  make.RV(vals, probs.or.odds, fractions = FALSE)
 }
 \arguments{
   \item{vals}{vector of possible outcomes}
 
   \item{probs.or.odds}{vector of probabilities or odds.}
+
+  \item{fractions}{If TRUE, return the probabilities as
+  fractions}
 }
 \value{
   random variable as RV object.

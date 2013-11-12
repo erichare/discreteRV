@@ -4,6 +4,7 @@
 #' @docType package
 #' @param vals vector of possible outcomes
 #' @param probs.or.odds vector of probabilities or odds.
+#' @param fractions If TRUE, return the probabilities as fractions
 #' @return random variable as RV object.
 #' @export
 #' @examples
@@ -21,7 +22,7 @@
 #' 
 #' # Make a loaded die, specifying odds 1:1:1:1:2:4 rather than probabilities:
 #' X.loaded.die <- make.RV(1:6, c(1,1,1,1,2,4))
-make.RV <- function(vals, probs.or.odds) {
+make.RV <- function(vals, probs.or.odds, fractions = FALSE) {
     ## Check if odds or probs
     pr <- sapply(probs.or.odds, function(pstr) eval(parse(text=pstr)));
     
@@ -38,6 +39,9 @@ make.RV <- function(vals, probs.or.odds) {
     
     names(vals) <- probs.or.odds
     class(vals) <- "RV"
+    
+    if (fractions) {require(MASS); names(vals) <- fractions(as.numeric(names(vals)))}
+    
     vals 
 } 
 
@@ -79,18 +83,22 @@ probs <- function(X, scipen=10, digits=22) {
 #' @param digits number of digits of precision used in the calculation. By default set to 15. 
 #' @param scipen A penalty to be applied when deciding to print numeric values in fixed or exponential notation. Positive values bias towards fixed and negative towards scientific notation: fixed notation will be preferred unless it is more than scipen digits wider
 #' @param sep separator between items from marginal distributions, by default set to "."
+#' @param fractions If TRUE, return the probabilities as fractions
 #' @export
 #' @examples
 #' d <- make.RV(c("A","B","C"), c(3,5,11))
 #' d2 <- mult(d,d)
 #' probs(d2)
-mult <- function(X, Y, digits=15, scipen=10, sep=".") {
+mult <- function(X, Y, digits=15, scipen=10, sep=".", fractions = FALSE) {
     S <- X
     tmp <- tapply(outer(probs(S), probs(Y), FUN="*"),
                   outer(S, Y, FUN="paste", sep=sep), paste, sep=sep)
     S <- as.character(names(tmp))
     names(S) <- as.numeric(tmp)
     class(S) <- "RV"
+    
+    if (fractions) {require(MASS); names(S) <- fractions(as.numeric(names(S)))}
+    
     return(S)
 }
 
@@ -102,12 +110,13 @@ mult <- function(X, Y, digits=15, scipen=10, sep=".") {
 #' @param digits number of digits of precision used in the calculation. By default set to 15. 
 #' @param scipen A penalty to be applied when deciding to print numeric values in fixed or exponential notation. Positive values bias towards fixed and negative towards scientific notation: fixed notation will be preferred unless it is more than scipen digits wider
 #' @param sep separator between items from marginal distributions, by default set to "."
+#' @param fractions If TRUE, return the probabilities as fractions
 #' @export
 #' @examples
 #' d <- make.RV(c("A","B","C"), c(3,5,11))
 #' d2 <- multN(d)
 #' probs(d2)
-multN <- function(X, n=2, digits=30, scipen=20, sep=".") {
+multN <- function(X, n=2, digits=30, scipen=20, sep=".", fractions = FALSE) {
     S <- X;  i <- 2
     while(i<=n) {
         tmp <- tapply(outer(probs(S), probs(X), FUN="*"),
@@ -117,6 +126,9 @@ multN <- function(X, n=2, digits=30, scipen=20, sep=".") {
         i <- i+1
     }
     class(S) <- "RV"
+    
+    if (fractions) {require(MASS); names(S) <- fractions(as.numeric(names(S)))}
+    
     return(S)
 }
 

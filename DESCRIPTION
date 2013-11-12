@@ -1,17 +1,17 @@
 Package: discreteRV
 Maintainer: Eric Hare <erichare@iastate.edu>
 Author: Andreas Buja
-Version: 1.0.1
+Version: 1.0.2
 License: GPL-3
 Title: Functions to create and manipulate discrete random variables
-Depends:
-    plyr
 Description: discreteRV implements a set of functions that allow computations
     involving discrete random variables.  It uses a syntax which is familiar to
     that which is used in mathematical statistics and probability courses.
 Suggests:
     testthat,
-    roxygen2
+    roxygen2,
+    MASS,
+    plyr
 Collate:
     'discreteRV-Probabilities.r'
     'discreteRV-Simulations.r'

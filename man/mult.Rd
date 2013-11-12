@@ -2,7 +2,8 @@
 \alias{mult}
 \title{Joint probability mass function of random variables X and Y}
 \usage{
-  mult(X, Y, digits = 15, scipen = 10, sep = ".")
+  mult(X, Y, digits = 15, scipen = 10, sep = ".",
+    fractions = FALSE)
 }
 \arguments{
   \item{X}{random variable}
@@ -20,6 +21,9 @@
 
   \item{sep}{separator between items from marginal
   distributions, by default set to "."}
+
+  \item{fractions}{If TRUE, return the probabilities as
+  fractions}
 }
 \description{
   Joint probability mass function of random variables X and

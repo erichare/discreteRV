@@ -2,7 +2,8 @@
 \alias{multN}
 \title{Probability mass function of  X^n}
 \usage{
-  multN(X, n = 2, digits = 30, scipen = 20, sep = ".")
+  multN(X, n = 2, digits = 30, scipen = 20, sep = ".",
+    fractions = FALSE)
 }
 \arguments{
   \item{X}{random variable}
@@ -20,6 +21,9 @@
 
   \item{sep}{separator between items from marginal
   distributions, by default set to "."}
+
+  \item{fractions}{If TRUE, return the probabilities as
+  fractions}
 }
 \description{
   Probability mass function of X^n
