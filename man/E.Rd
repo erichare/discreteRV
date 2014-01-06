@@ -2,13 +2,13 @@
 \alias{E}
 \title{Expected value of a random variable}
 \usage{
-  E(X)
+E(X)
 }
 \arguments{
   \item{X}{random variable}
 }
 \description{
-  Expected value of a random variable
+Expected value of a random variable
 }
 \examples{
 X.Bern <- make.RV(c(1,0), c(.5,.5))

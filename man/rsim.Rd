@@ -2,7 +2,7 @@
 \alias{rsim}
 \title{Simulate n independent trials from a random variable X:}
 \usage{
-  rsim(n, X)
+rsim(n, X)
 }
 \arguments{
   \item{n}{The number of independent trials to simulate}
@@ -10,7 +10,7 @@
   \item{X}{A random variable}
 }
 \description{
-  Simulate n independent trials from a random variable X:
+Simulate n independent trials from a random variable X:
 }
 \examples{
 X.Bern <- make.RV(c(1,0), c(.5,.5))

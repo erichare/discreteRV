@@ -2,15 +2,15 @@
 \alias{Prop}
 \title{Proportion of an event observed in a vector of simulated trials}
 \usage{
-  Prop(X.sim)
+Prop(X.sim)
 }
 \arguments{
   \item{X.sim}{A simulated data vector produced with the
   'rsim()' function}
 }
 \description{
-  Proportion of an event observed in a vector of simulated
-  trials
+Proportion of an event observed in a vector of simulated
+trials
 }
 \examples{
 X <- make.RV(c(100000,10000,0), c(0.00025,0.005,0.99475))

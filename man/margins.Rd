@@ -2,7 +2,7 @@
 \alias{margins}
 \title{Marginal distribution of a joint random variable}
 \usage{
-  margins(X, sep = ".")
+margins(X, sep = ".")
 }
 \arguments{
   \item{X}{a random variable}
@@ -11,8 +11,8 @@
   dimensions, defaults to "."}
 }
 \description{
-  Extracts the marginal probability mass functions from a
-  joint distribution.
+Extracts the marginal probability mass functions from a
+joint distribution.
 }
 \examples{
 X <- make.RV(1:6, 1:6)
@@ -20,6 +20,6 @@ X3 <- multN(X, 3)
 margins(X3)
 }
 \author{
-  Heike Hofmann \email{hofmann@iastate.edu}
+Heike Hofmann \email{hofmann@iastate.edu}
 }
 

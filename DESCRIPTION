@@ -12,6 +12,3 @@ Suggests:
     roxygen2,
     MASS,
     plyr
-Collate:
-    'discreteRV-Probabilities.r'
-    'discreteRV-Simulations.r'

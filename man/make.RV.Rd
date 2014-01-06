@@ -4,7 +4,7 @@
 \alias{make.RV-package}
 \title{Make a random variable consisting of possible outcome values and their probabilities or odds}
 \usage{
-  make.RV(vals, probs.or.odds, fractions = FALSE)
+make.RV(vals, probs.or.odds, fractions = TRUE)
 }
 \arguments{
   \item{vals}{vector of possible outcomes}
@@ -15,11 +15,11 @@
   fractions}
 }
 \value{
-  random variable as RV object.
+random variable as RV object.
 }
 \description{
-  Make a random variable consisting of possible outcome
-  values and their probabilities or odds
+Make a random variable consisting of possible outcome
+values and their probabilities or odds
 }
 \examples{
 # Make a 50:50 Bernoulli random variable:

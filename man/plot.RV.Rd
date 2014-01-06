@@ -2,11 +2,10 @@
 \alias{plot.RV}
 \title{Plot a random variable of class "RV"}
 \usage{
-  \method{plot}{RV} (x, ..., pch = 16, cex = 1.2, lwd = 2,
-    col = "black", stretch.x = 1.2, stretch.y = 1.2,
-    xlab = "Possible Values", ylab = "Probabilities",
-    xlim = mean(range(x)) + (range(x) - mean(range(x))) * stretch.x,
-    ylim = c(0, max(probs(x)) * stretch.y))
+\method{plot}{RV}(x, ..., pch = 16, cex = 1.2, lwd = 2, col = "black",
+  stretch.x = 1.2, stretch.y = 1.2, xlab = "Possible Values",
+  ylab = "Probabilities", xlim = mean(range(x)) + (range(x) -
+  mean(range(x))) * stretch.x, ylim = c(0, max(probs(x)) * stretch.y))
 }
 \arguments{
   \item{x}{A random variable}
@@ -43,7 +42,7 @@
   \item{ylim}{Lower and upper limit for the y axis}
 }
 \description{
-  Plot a random variable of class "RV"
+Plot a random variable of class "RV"
 }
 \examples{
 fair.die <- make.RV(1:6, rep("1/6",6))

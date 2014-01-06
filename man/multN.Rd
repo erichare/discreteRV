@@ -2,8 +2,7 @@
 \alias{multN}
 \title{Probability mass function of  X^n}
 \usage{
-  multN(X, n = 2, digits = 30, scipen = 20, sep = ".",
-    fractions = FALSE)
+multN(X, n = 2, digits = 30, scipen = 20, sep = ".", fractions = TRUE)
 }
 \arguments{
   \item{X}{random variable}
@@ -26,7 +25,7 @@
   fractions}
 }
 \description{
-  Probability mass function of X^n
+Probability mass function of X^n
 }
 \examples{
 d <- make.RV(c("A","B","C"), c(3,5,11))
@@ -34,6 +33,6 @@ d2 <- multN(d)
 probs(d2)
 }
 \author{
-  Heike Hofmann \email{hofmann@iastate.edu}
+Heike Hofmann \email{hofmann@iastate.edu}
 }
 

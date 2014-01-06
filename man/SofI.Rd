@@ -2,7 +2,7 @@
 \alias{SofI}
 \title{Sum of independent random variables}
 \usage{
-  SofI(..., digits = 15, scipen = 10)
+SofI(..., digits = 15, scipen = 10, fractions = TRUE)
 }
 \arguments{
   \item{...}{Arbitrary number of random variables}
@@ -15,9 +15,12 @@
   Positive values bias towards fixed and negative towards
   scientific notation: fixed notation will be preferred
   unless it is more than scipen digits wider}
+
+  \item{fractions}{If TRUE, return the probabilities as
+  fractions}
 }
 \description{
-  Sum of independent random variables
+Sum of independent random variables
 }
 \examples{
 X.Bern <- make.RV(c(1,0), c(.5,.5))

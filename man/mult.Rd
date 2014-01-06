@@ -2,8 +2,7 @@
 \alias{mult}
 \title{Joint probability mass function of random variables X and Y}
 \usage{
-  mult(X, Y, digits = 15, scipen = 10, sep = ".",
-    fractions = FALSE)
+mult(X, Y, digits = 15, scipen = 10, sep = ".", fractions = TRUE)
 }
 \arguments{
   \item{X}{random variable}
@@ -26,8 +25,7 @@
   fractions}
 }
 \description{
-  Joint probability mass function of random variables X and
-  Y
+Joint probability mass function of random variables X and Y
 }
 \examples{
 d <- make.RV(c("A","B","C"), c(3,5,11))
@@ -35,6 +33,6 @@ d2 <- mult(d,d)
 probs(d2)
 }
 \author{
-  Heike Hofmann \email{hofmann@iastate.edu}
+Heike Hofmann \email{hofmann@iastate.edu}
 }
 

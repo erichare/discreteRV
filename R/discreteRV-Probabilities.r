@@ -22,7 +22,7 @@
 #' 
 #' # Make a loaded die, specifying odds 1:1:1:1:2:4 rather than probabilities:
 #' X.loaded.die <- make.RV(1:6, c(1,1,1,1,2,4))
-make.RV <- function(vals, probs.or.odds, fractions = FALSE) {
+make.RV <- function(vals, probs.or.odds, fractions = TRUE) {
     ## Check if odds or probs
     pr <- sapply(probs.or.odds, function(pstr) eval(parse(text=pstr)));
     
@@ -89,7 +89,7 @@ probs <- function(X, scipen=10, digits=22) {
 #' d <- make.RV(c("A","B","C"), c(3,5,11))
 #' d2 <- mult(d,d)
 #' probs(d2)
-mult <- function(X, Y, digits=15, scipen=10, sep=".", fractions = FALSE) {
+mult <- function(X, Y, digits=15, scipen=10, sep=".", fractions = TRUE) {
     S <- X
     tmp <- tapply(outer(probs(S), probs(Y), FUN="*"),
                   outer(S, Y, FUN="paste", sep=sep), paste, sep=sep)
@@ -116,7 +116,7 @@ mult <- function(X, Y, digits=15, scipen=10, sep=".", fractions = FALSE) {
 #' d <- make.RV(c("A","B","C"), c(3,5,11))
 #' d2 <- multN(d)
 #' probs(d2)
-multN <- function(X, n=2, digits=30, scipen=20, sep=".", fractions = FALSE) {
+multN <- function(X, n=2, digits=30, scipen=20, sep=".", fractions = TRUE) {
     S <- X;  i <- 2
     while(i<=n) {
         tmp <- tapply(outer(probs(S), probs(X), FUN="*"),
@@ -210,6 +210,7 @@ KURT <- function(X) { E((X-E(X))^4)/V(X)^2 }
 #' @param ... Arbitrary number of random variables
 #' @param digits number of digits of precision used in the calculation. By defualt set to 15. 
 #' @param scipen A penalty to be applied when deciding to print numeric values in fixed or exponential notation. Positive values bias towards fixed and negative towards scientific notation: fixed notation will be preferred unless it is more than scipen digits wider
+#' @param fractions If TRUE, return the probabilities as fractions
 #' @export
 #' @examples
 #' X.Bern <- make.RV(c(1,0), c(.5,.5))
@@ -217,7 +218,7 @@ KURT <- function(X) { E((X-E(X))^4)/V(X)^2 }
 #' 
 #' S5 <- SofI(X.Bern, X.Bern, X.Bern, X.Bern, X.Bern)  
 #' S.mix <- SofI(X.Bern, X.fair.die)  # Independent but not IID
-SofI <- function(..., digits=15, scipen=10) {
+SofI <- function(..., digits=15, scipen=10, fractions=TRUE) {
     LIST <- list(...)
     S <- LIST[[1]]
     LIST <- LIST[-1]
@@ -231,6 +232,10 @@ SofI <- function(..., digits=15, scipen=10) {
         LIST <- LIST[-1]
     }
     class(S) <- "RV"
+    if (fractions) {
+        require(MASS)
+        names(S) <- fractions(as.numeric(names(S)))
+    }
     return(S)
 }
 
@@ -240,6 +245,7 @@ SofI <- function(..., digits=15, scipen=10) {
 #' @param n The number of Xs to sum
 #' @param digits number of digits of precision used in the calculation. By defualt set to 15. 
 #' @param scipen A penalty to be applied when deciding to print numeric values in fixed or exponential notation. Positive values bias towards fixed and negative towards scientific notation: fixed notation will be preferred unless it is more than scipen digits wider
+#' @param fractions If TRUE, return the probabilities as fractions
 #' @param progress If TRUE, display a progress bar
 #' @export
 #' @examples
@@ -247,7 +253,7 @@ SofI <- function(..., digits=15, scipen=10) {
 #' 
 #' S5 <- SofIID(X.Bern, 5)
 #' S128 <- SofIID(X.Bern, 128)
-SofIID <- function(X, n=2, digits=15, scipen=10, progress=TRUE) {
+SofIID <- function(X, n=2, digits=15, scipen=10, progress=TRUE, fractions=TRUE) {
     S <- X;  i <- 2
     pb <- txtProgressBar(min = 1, max = n)
     while(i<=n) {
@@ -262,6 +268,10 @@ SofIID <- function(X, n=2, digits=15, scipen=10, progress=TRUE) {
     close(pb)
     
     class(S) <- "RV"
+    if (fractions) {
+        require(MASS)
+        names(S) <- fractions(as.numeric(names(S)))
+    }
     return(S)
 }
 

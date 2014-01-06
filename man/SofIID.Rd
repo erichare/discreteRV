@@ -2,8 +2,8 @@
 \alias{SofIID}
 \title{Sum of independent identically distributed random variables}
 \usage{
-  SofIID(X, n = 2, digits = 15, scipen = 10,
-    progress = TRUE)
+SofIID(X, n = 2, digits = 15, scipen = 10, progress = TRUE,
+  fractions = TRUE)
 }
 \arguments{
   \item{X}{A random variable}
@@ -19,11 +19,13 @@
   scientific notation: fixed notation will be preferred
   unless it is more than scipen digits wider}
 
+  \item{fractions}{If TRUE, return the probabilities as
+  fractions}
+
   \item{progress}{If TRUE, display a progress bar}
 }
 \description{
-  Sum of independent identically distributed random
-  variables
+Sum of independent identically distributed random variables
 }
 \examples{
 X.Bern <- make.RV(c(1,0), c(.5,.5))

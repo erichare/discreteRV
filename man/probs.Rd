@@ -2,7 +2,7 @@
 \alias{probs}
 \title{Probability mass function of random variable X}
 \usage{
-  probs(X, scipen = 10, digits = 22)
+probs(X, scipen = 10, digits = 22)
 }
 \arguments{
   \item{X}{random variable}
@@ -17,12 +17,12 @@
   unless it is more than scipen digits wider}
 }
 \value{
-  named vector of probablities for each element of the
-  random variable
+named vector of probablities for each element of the random
+variable
 }
 \description{
-  Obtain the list of probabilities from a random variable:
-  p(x)
+Obtain the list of probabilities from a random variable:
+p(x)
 }
 \examples{
 X.Bern <- make.RV(c(1,0), c(.5,.5))

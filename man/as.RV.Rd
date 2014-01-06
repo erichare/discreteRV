@@ -3,14 +3,14 @@
 \title{Turn a probability vector with possible outcome values in the 'names()' attribute
 into a random variable:}
 \usage{
-  as.RV(px)
+as.RV(px)
 }
 \arguments{
   \item{px}{A probability vector with possible outcome
   values in the 'names()' attribute}
 }
 \description{
-  Turn a probability vector with possible outcome values in
-  the 'names()' attribute into a random variable:
+Turn a probability vector with possible outcome values in
+the 'names()' attribute into a random variable:
 }
 

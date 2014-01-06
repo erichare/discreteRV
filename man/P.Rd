@@ -2,14 +2,14 @@
 \alias{P}
 \title{Calculate probabilities of events}
 \usage{
-  P(event)
+P(event)
 }
 \arguments{
   \item{event}{A logical vector, with names equal to the
   probabilities}
 }
 \description{
-  Calculate probabilities of events
+Calculate probabilities of events
 }
 \examples{
 X.fair.die <- make.RV(1:6, rep("1/6",6))
