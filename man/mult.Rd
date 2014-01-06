@@ -2,7 +2,7 @@
 \alias{mult}
 \title{Joint probability mass function of random variables X and Y}
 \usage{
-mult(X, Y, digits = 15, scipen = 10, sep = ".", fractions = TRUE)
+mult(X, Y, digits = 15, scipen = 10, sep = ".", fractions = FALSE)
 }
 \arguments{
   \item{X}{random variable}

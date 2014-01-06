@@ -3,7 +3,7 @@
 \title{Sum of independent identically distributed random variables}
 \usage{
 SofIID(X, n = 2, digits = 15, scipen = 10, progress = TRUE,
-  fractions = TRUE)
+  fractions = FALSE)
 }
 \arguments{
   \item{X}{A random variable}

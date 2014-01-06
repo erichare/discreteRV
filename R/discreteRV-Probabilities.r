@@ -89,7 +89,7 @@ probs <- function(X, scipen=10, digits=22) {
 #' d <- make.RV(c("A","B","C"), c(3,5,11))
 #' d2 <- mult(d,d)
 #' probs(d2)
-mult <- function(X, Y, digits=15, scipen=10, sep=".", fractions = TRUE) {
+mult <- function(X, Y, digits=15, scipen=10, sep=".", fractions=FALSE) {
     S <- X
     tmp <- tapply(outer(probs(S), probs(Y), FUN="*"),
                   outer(S, Y, FUN="paste", sep=sep), paste, sep=sep)
@@ -116,7 +116,7 @@ mult <- function(X, Y, digits=15, scipen=10, sep=".", fractions = TRUE) {
 #' d <- make.RV(c("A","B","C"), c(3,5,11))
 #' d2 <- multN(d)
 #' probs(d2)
-multN <- function(X, n=2, digits=30, scipen=20, sep=".", fractions = TRUE) {
+multN <- function(X, n=2, digits=30, scipen=20, sep=".", fractions=FALSE) {
     S <- X;  i <- 2
     while(i<=n) {
         tmp <- tapply(outer(probs(S), probs(X), FUN="*"),
@@ -218,7 +218,7 @@ KURT <- function(X) { E((X-E(X))^4)/V(X)^2 }
 #' 
 #' S5 <- SofI(X.Bern, X.Bern, X.Bern, X.Bern, X.Bern)  
 #' S.mix <- SofI(X.Bern, X.fair.die)  # Independent but not IID
-SofI <- function(..., digits=15, scipen=10, fractions=TRUE) {
+SofI <- function(..., digits=15, scipen=10, fractions=FALSE) {
     LIST <- list(...)
     S <- LIST[[1]]
     LIST <- LIST[-1]
@@ -253,7 +253,7 @@ SofI <- function(..., digits=15, scipen=10, fractions=TRUE) {
 #' 
 #' S5 <- SofIID(X.Bern, 5)
 #' S128 <- SofIID(X.Bern, 128)
-SofIID <- function(X, n=2, digits=15, scipen=10, progress=TRUE, fractions=TRUE) {
+SofIID <- function(X, n=2, digits=15, scipen=10, progress=TRUE, fractions=FALSE) {
     S <- X;  i <- 2
     pb <- txtProgressBar(min = 1, max = n)
     while(i<=n) {
