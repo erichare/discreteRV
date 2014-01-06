@@ -4,7 +4,7 @@
 \alias{make.RV-package}
 \title{Make a random variable consisting of possible outcome values and their probabilities or odds}
 \usage{
-make.RV(vals, probs.or.odds, fractions = TRUE)
+make.RV(vals, probs.or.odds, fractions = FALSE)
 }
 \arguments{
   \item{vals}{vector of possible outcomes}

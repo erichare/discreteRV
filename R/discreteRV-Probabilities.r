@@ -22,7 +22,7 @@
 #' 
 #' # Make a loaded die, specifying odds 1:1:1:1:2:4 rather than probabilities:
 #' X.loaded.die <- make.RV(1:6, c(1,1,1,1,2,4))
-make.RV <- function(vals, probs.or.odds, fractions = TRUE) {
+make.RV <- function(vals, probs.or.odds, fractions = FALSE) {
     ## Check if odds or probs
     pr <- sapply(probs.or.odds, function(pstr) eval(parse(text=pstr)));
     
