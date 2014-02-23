@@ -45,7 +45,48 @@ make.RV <- function(vals, probs.or.odds, fractions = FALSE) {
     vals 
 } 
 
+conditional <- function(XY, cond = "> -Inf", sep = ",") {    
+    cond.vec <- eval(parse(text = paste("margins(", substitute(XY), ")$'2' ", cond, sep = "")))
+    
+    if (cond == "> -Inf") {
+        marginal.dist <- margins(XY)$'2'[cond.vec]
+            
+        distns <- lapply(1:length(marginal.dist), function(y) {
+            sub <- XY[grep(paste(",", marginal.dist[y], sep = ""), XY)]
+            pr <- sapply(names(sub), function(pstr) eval(parse(text=pstr)))
+            probs.sub <- pr / sum(pr)
+            
+            make.RV(sub, probs.sub, fractions = TRUE)
+        })
+        
+        return(distns)
+    } else {
+        hits <- XY[cond.vec]
+        outcomes <- sapply(hits, function(y){strsplit(y, ",")[[1]][1]})
+        new.hits <- sapply(unique(outcomes), function(y){sum(probs(hits)[outcomes == y])})
+        
+        return(as.RV(new.hits, fractions = TRUE))
+    }
+}
 
+"|.RV" <- function(X, Y) {
+    X.str <- substitute(X)
+    Y.str <- substitute(Y)
+    
+    Y.str.chr <- as.character(Y.str)
+    
+    joint <- eval(parse(text = paste(X.str, (if (length(Y.str.chr) == 3) Y.str.chr[2] else Y.str.chr), sep = "")))
+    
+    return(conditional(joint, Y.str.chr))
+}
+
+"%OR%" <- function(X, Y) {
+    return(X | Y)
+}
+
+"%AND%" <- function(X, Y) {
+    return(X & Y)
+}
 
 #' Probability mass function of random variable X 
 #'
@@ -82,14 +123,14 @@ probs <- function(X, scipen=10, digits=22) {
 #' @param Y random variable
 #' @param digits number of digits of precision used in the calculation. By default set to 15. 
 #' @param scipen A penalty to be applied when deciding to print numeric values in fixed or exponential notation. Positive values bias towards fixed and negative towards scientific notation: fixed notation will be preferred unless it is more than scipen digits wider
-#' @param sep separator between items from marginal distributions, by default set to "."
+#' @param sep separator between items from marginal distributions, by default set to ","
 #' @param fractions If TRUE, return the probabilities as fractions
 #' @export
 #' @examples
 #' d <- make.RV(c("A","B","C"), c(3,5,11))
 #' d2 <- mult(d,d)
 #' probs(d2)
-mult <- function(X, Y, digits=15, scipen=10, sep=".", fractions=FALSE) {
+mult <- function(X, Y, digits=15, scipen=10, sep=",", fractions=FALSE) {
     S <- X
     tmp <- tapply(outer(probs(S), probs(Y), FUN="*"),
                   outer(S, Y, FUN="paste", sep=sep), paste, sep=sep)
@@ -109,14 +150,14 @@ mult <- function(X, Y, digits=15, scipen=10, sep=".", fractions=FALSE) {
 #' @param n power
 #' @param digits number of digits of precision used in the calculation. By default set to 15. 
 #' @param scipen A penalty to be applied when deciding to print numeric values in fixed or exponential notation. Positive values bias towards fixed and negative towards scientific notation: fixed notation will be preferred unless it is more than scipen digits wider
-#' @param sep separator between items from marginal distributions, by default set to "."
+#' @param sep separator between items from marginal distributions, by default set to ","
 #' @param fractions If TRUE, return the probabilities as fractions
 #' @export
 #' @examples
 #' d <- make.RV(c("A","B","C"), c(3,5,11))
 #' d2 <- multN(d)
 #' probs(d2)
-multN <- function(X, n=2, digits=30, scipen=20, sep=".", fractions=FALSE) {
+multN <- function(X, n=2, digits=30, scipen=20, sep=",", fractions=FALSE) {
     S <- X;  i <- 2
     while(i<=n) {
         tmp <- tapply(outer(probs(S), probs(X), FUN="*"),
@@ -136,10 +177,14 @@ multN <- function(X, n=2, digits=30, scipen=20, sep=".", fractions=FALSE) {
 #' into a random variable:
 #'
 #' @param px A probability vector with possible outcome values in the 'names()' attribute
+#' @param fractions If TRUE, return the probabilities as fractions
+#' 
 #' @export
-as.RV <- function(px) {
+as.RV <- function(px, fractions = FALSE) {
     X <- as.numeric(names(px))
+    
     names(X) <- px
+    if (fractions) {require(MASS); names(X) <- fractions(as.numeric(names(X)))}
     class(X) <- "RV"
     X
 }
@@ -362,13 +407,13 @@ qqnorm.RV <- function(y, ..., pch=16, cex=.5, add=FALSE,
 #' Extracts the marginal probability mass functions from a joint distribution.
 #' @author Heike Hofmann \email{hofmann@@iastate.edu}
 #' @param X a random variable
-#' @param sep parameter specifying the separator between dimensions, defaults to "."
+#' @param sep parameter specifying the separator between dimensions, defaults to ","
 #' @export
 #' @examples
 #' X <- make.RV(1:6, 1:6)
 #' X3 <- multN(X, 3)
 #' margins(X3)
-margins <- function(X, sep=".") {
+margins <- function(X, sep=",") {
     dframe <- sapply(strsplit(as.character(X), split=sep, fixed=TRUE), function(x) as.matrix(x))
     
     require(plyr)

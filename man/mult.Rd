@@ -2,7 +2,7 @@
 \alias{mult}
 \title{Joint probability mass function of random variables X and Y}
 \usage{
-mult(X, Y, digits = 15, scipen = 10, sep = ".", fractions = FALSE)
+mult(X, Y, digits = 15, scipen = 10, sep = ",", fractions = FALSE)
 }
 \arguments{
   \item{X}{random variable}
@@ -19,7 +19,7 @@ mult(X, Y, digits = 15, scipen = 10, sep = ".", fractions = FALSE)
   unless it is more than scipen digits wider}
 
   \item{sep}{separator between items from marginal
-  distributions, by default set to "."}
+  distributions, by default set to ","}
 
   \item{fractions}{If TRUE, return the probabilities as
   fractions}

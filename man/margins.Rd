@@ -2,13 +2,13 @@
 \alias{margins}
 \title{Marginal distribution of a joint random variable}
 \usage{
-margins(X, sep = ".")
+margins(X, sep = ",")
 }
 \arguments{
   \item{X}{a random variable}
 
   \item{sep}{parameter specifying the separator between
-  dimensions, defaults to "."}
+  dimensions, defaults to ","}
 }
 \description{
 Extracts the marginal probability mass functions from a
