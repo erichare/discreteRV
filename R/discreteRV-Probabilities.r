@@ -69,15 +69,67 @@ conditional <- function(XY, cond = "> -Inf", sep = ",") {
     }
 }
 
-"|.RV" <- function(X, Y) {
-    X.str <- substitute(X)
-    Y.str <- substitute(Y)
+">.RV" <- function(X, c) {
+    X.notrv <- X
+    class(X.notrv) <- "lol"
     
-    Y.str.chr <- as.character(Y.str)
+    result <- X.notrv > c
+    class(result) <- "RVresult"
+    attr(result, "outcomes") <- as.vector(X)
     
-    joint <- eval(parse(text = paste(X.str, (if (length(Y.str.chr) == 3) Y.str.chr[2] else Y.str.chr), sep = "")))
+    return(result)
+}
+
+">=.RV" <- function(X, c) {
+    X.notrv <- X
+    class(X.notrv) <- "lol"
     
-    return(conditional(joint, Y.str.chr))
+    result <- X.notrv >= c
+    class(result) <- "RVresult"
+    attr(result, "outcomes") <- as.vector(X)
+    
+    return(result)
+}
+
+"==.RV" <- function(X, c) {
+    X.notrv <- X
+    class(X.notrv) <- "lol"
+    
+    result <- X.notrv == c
+    class(result) <- "RVresult"
+    attr(result, "outcomes") <- as.vector(X)
+    
+    return(result)
+}
+
+"<=.RV" <- function(X, c) {
+    X.notrv <- X
+    class(X.notrv) <- "lol"
+    
+    result <- X.notrv <= c
+    class(result) <- "RVresult"
+    attr(result, "outcomes") <- as.vector(X)
+    
+    return(result)
+}
+
+"<.RV" <- function(X, c) {
+    X.notrv <- X
+    class(X.notrv) <- "lol"
+    
+    result <- X.notrv < c
+    class(result) <- "RVresult"
+    attr(result, "outcomes") <- as.vector(X)
+    
+    return(result)
+}
+
+"|.RVresult" <- function(vec1, vec2) {
+    result <- P(vec1 & vec2) / P(vec2)
+    if (is.nan(result)) result <- 0
+    class(result) <- "RVcond"
+    
+    return(result)
 }
 
 "%OR%" <- function(X, Y) {
@@ -114,7 +166,6 @@ probs <- function(X, scipen=10, digits=22) {
     if(any(is.na(pr))) pr[is.na(pr)] <- pmax(0, (1-sum(pr[!is.na(pr)]))/sum(is.na(pr)))
     pr/sum(pr) 
 }
-
 
 #' Joint probability mass function of random variables X and Y
 #'
@@ -200,7 +251,13 @@ as.RV <- function(px, fractions = FALSE) {
 #' X.loaded.die <- make.RV(1:6, c(1,1,1,1,2,4))
 #' P(X.loaded.die>3)
 #' P(X.loaded.die==6)
-P <- function(event) { sum(probs(event)[event]) }
+P <- function(x,...) UseMethod("P")
+
+P.default <- function(event) { sum(probs(event)[event]) }
+
+P.RVcond <- function(vec) {
+    return(as.numeric(vec))
+}
 
 #' Expected value of a random variable
 #' 
