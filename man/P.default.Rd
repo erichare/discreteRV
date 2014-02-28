@@ -1,8 +1,8 @@
-\name{P}
-\alias{P}
+\name{P.default}
+\alias{P.default}
 \title{Calculate probabilities of events}
 \usage{
-P(x, ...)
+\method{P}{default}(event)
 }
 \arguments{
   \item{event}{A logical vector, with names equal to the

@@ -45,99 +45,86 @@ make.RV <- function(vals, probs.or.odds, fractions = FALSE) {
     vals 
 } 
 
-conditional <- function(XY, cond = "> -Inf", sep = ",") {    
+conditional <- function(XY, sep = ",") {    
     cond.vec <- eval(parse(text = paste("margins(", substitute(XY), ")$'2' ", cond, sep = "")))
     
-    if (cond == "> -Inf") {
-        marginal.dist <- margins(XY)$'2'[cond.vec]
-            
-        distns <- lapply(1:length(marginal.dist), function(y) {
-            sub <- XY[grep(paste(",", marginal.dist[y], sep = ""), XY)]
-            pr <- sapply(names(sub), function(pstr) eval(parse(text=pstr)))
-            probs.sub <- pr / sum(pr)
-            
-            make.RV(sub, probs.sub, fractions = TRUE)
-        })
+    marginal.dist <- margins(XY)$'2'[cond.vec]
         
-        return(distns)
-    } else {
-        hits <- XY[cond.vec]
-        outcomes <- sapply(hits, function(y){strsplit(y, ",")[[1]][1]})
-        new.hits <- sapply(unique(outcomes), function(y){sum(probs(hits)[outcomes == y])})
+    distns <- lapply(1:length(marginal.dist), function(y) {
+        sub <- XY[grep(paste(",", marginal.dist[y], sep = ""), XY)]
+        pr <- sapply(names(sub), function(pstr) eval(parse(text=pstr)))
+        probs.sub <- pr / sum(pr)
         
-        return(as.RV(new.hits, fractions = TRUE))
-    }
+        make.RV(sub, probs.sub, fractions = TRUE)
+    })
+    
+    return(distns)
 }
 
-">.RV" <- function(X, c) {
+unopset <- function(X, cond, x) {
     X.notrv <- X
-    class(X.notrv) <- "lol"
+    class(X.notrv) <- NULL
     
-    result <- X.notrv > c
+    result <- eval(parse(text = paste("X.notrv", cond, x)))
     class(result) <- "RVresult"
+    
     attr(result, "outcomes") <- as.vector(X)
+    attr(result, "rv") <- substitute(X)
     
     return(result)
 }
 
-">=.RV" <- function(X, c) {
-    X.notrv <- X
-    class(X.notrv) <- "lol"
-    
-    result <- X.notrv >= c
+binopset <- function(X, cond, Y) {
+    result <- eval(parse(text = paste("as.logical(X)", cond, "as.logical(Y)")))
     class(result) <- "RVresult"
-    attr(result, "outcomes") <- as.vector(X)
+    
+    attr(result, "outcomes") <- attr(X, "outcomes")
+    attr(result, "rv") <- substitute(X)
+    
+    names(result) <- probs(X)
     
     return(result)
 }
 
-"==.RV" <- function(X, c) {
-    X.notrv <- X
-    class(X.notrv) <- "lol"
-    
-    result <- X.notrv == c
-    class(result) <- "RVresult"
-    attr(result, "outcomes") <- as.vector(X)
-    
-    return(result)
-}
+#' @export
+"<.RV" <- function(X, x) { return(unopset(X, "<", x)) }
+#' @export
+"<=.RV" <- function(X, x) { return(unopset(X, "<=", x)) }
+#' @export
+"==.RV" <- function(X, x) { return(unopset(X, "==", x)) }
+#' @export
+">=.RV" <- function(X, x) { return(unopset(X, ">=", x)) }
+#' @export
+">.RV" <- function(X, x) { return(unopset(X, ">", x)) }
 
-"<=.RV" <- function(X, c) {
-    X.notrv <- X
-    class(X.notrv) <- "lol"
-    
-    result <- X.notrv <= c
-    class(result) <- "RVresult"
-    attr(result, "outcomes") <- as.vector(X)
-    
-    return(result)
-}
+#' @export
+"%OR%" <- function(X, Y) { return(binopset(X, "|", Y)) }
+#' @export
+"%AND%" <- function(X, Y) { return(binopset(X, "&", Y)) }
 
-"<.RV" <- function(X, c) {
-    X.notrv <- X
-    class(X.notrv) <- "lol"
-    
-    result <- X.notrv < c
-    class(result) <- "RVresult"
-    attr(result, "outcomes") <- as.vector(X)
-    
-    return(result)
-}
-
+#' @export
 "|.RVresult" <- function(vec1, vec2) {
-    result <- P(vec1 & vec2) / P(vec2)
+    cond1 <- (attr(vec1, "rv") == attr(vec2, "rv"))
+    cond2 <- (gsub("[(=<>) 1-9]", "", paste(as.character(attr(vec1, "rv")), collapse = "")) == gsub("[(=<>) 1-9]", "", paste(as.character(attr(vec2, "rv")), collapse = "")))
+    
+    result <- if (cond1 | cond2) P(vec1 & vec2) / P(vec2) else P(vec1)
     if (is.nan(result)) result <- 0
     class(result) <- "RVcond"
     
     return(result)
 }
 
-"%OR%" <- function(X, Y) {
-    return(X | Y)
+#' @export
+"print.RVcond" <- function(vec) {
+    return(print.default(as.numeric(vec)))
 }
 
-"%AND%" <- function(X, Y) {
-    return(X & Y)
+#' @export
+"print.RVresult" <- function(X) {
+    vec <- (as.logical(X))
+    names(vec) <- attr(X, "outcomes")
+    
+    return(print.default(vec))
 }
 
 #' Probability mass function of random variable X 
@@ -240,6 +227,9 @@ as.RV <- function(px, fractions = FALSE) {
     X
 }
 
+#' @export
+P <- function(x) UseMethod("P")
+
 #' Calculate probabilities of events
 #'
 #' @param event A logical vector, with names equal to the probabilities
@@ -251,10 +241,9 @@ as.RV <- function(px, fractions = FALSE) {
 #' X.loaded.die <- make.RV(1:6, c(1,1,1,1,2,4))
 #' P(X.loaded.die>3)
 #' P(X.loaded.die==6)
-P <- function(x,...) UseMethod("P")
-
 P.default <- function(event) { sum(probs(event)[event]) }
 
+#' @export
 P.RVcond <- function(vec) {
     return(as.numeric(vec))
 }
