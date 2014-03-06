@@ -46,7 +46,7 @@ make.RV <- function(vals, probs.or.odds, fractions = FALSE) {
 } 
 
 conditional <- function(XY, sep = ",") {    
-    cond.vec <- eval(parse(text = paste("margins(", substitute(XY), ")$'2' ", cond, sep = "")))
+    cond.vec <- eval(parse(text = paste("margins(", substitute(XY), ")$'2'", sep = "")))
     
     marginal.dist <- margins(XY)$'2'[cond.vec]
         
@@ -61,7 +61,7 @@ conditional <- function(XY, sep = ",") {
     return(distns)
 }
 
-unopset <- function(X, cond, x) {
+unopset <- function(X, Xchar, cond, x) {
     X.notrv <- X
     class(X.notrv) <- NULL
     
@@ -69,17 +69,17 @@ unopset <- function(X, cond, x) {
     class(result) <- "RVresult"
     
     attr(result, "outcomes") <- as.vector(X)
-    attr(result, "rv") <- substitute(X)
+    attr(result, "rv") <- Xchar
     
     return(result)
 }
 
-binopset <- function(X, cond, Y) {
+binopset <- function(X, Xchar, cond, Y) {
     result <- eval(parse(text = paste("as.logical(X)", cond, "as.logical(Y)")))
     class(result) <- "RVresult"
     
     attr(result, "outcomes") <- attr(X, "outcomes")
-    attr(result, "rv") <- substitute(X)
+    attr(result, "rv") <- Xchar
     
     names(result) <- probs(X)
     
@@ -87,44 +87,79 @@ binopset <- function(X, cond, Y) {
 }
 
 #' @export
-"<.RV" <- function(X, x) { return(unopset(X, "<", x)) }
+"<.RV" <- function(X, x) { return(unopset(X, deparse(substitute(X)), "<", x)) }
 #' @export
-"<=.RV" <- function(X, x) { return(unopset(X, "<=", x)) }
+"<=.RV" <- function(X, x) { return(unopset(X, deparse(substitute(X)), "<=", x)) }
 #' @export
-"==.RV" <- function(X, x) { return(unopset(X, "==", x)) }
+"==.RV" <- function(X, x) { return(unopset(X, deparse(substitute(X)), "==", x)) }
 #' @export
-">=.RV" <- function(X, x) { return(unopset(X, ">=", x)) }
+"!=.RV" <- function(X, x) { return(unopset(X, deparse(substitute(X)), "!=", x)) }
 #' @export
-">.RV" <- function(X, x) { return(unopset(X, ">", x)) }
+">=.RV" <- function(X, x) { return(unopset(X, deparse(substitute(X)), ">=", x)) }
+#' @export
+">.RV" <- function(X, x) { return(unopset(X, deparse(substitute(X)), ">", x)) }
 
+#' Compute the logical OR of two events
+#' 
+#' @name %OR%
+#' @param X RVcond object
+#' @param Y RVcond object
+#' @return An RVresult object which is two events ORed together
 #' @export
-"%OR%" <- function(X, Y) { return(binopset(X, "|", Y)) }
-#' @export
-"%AND%" <- function(X, Y) { return(binopset(X, "&", Y)) }
+#' @examples
+#' X.fair.die <- make.RV(1:6, rep("1/6",6))
+#' P((X.fair.die == 4) %OR% (X.fair.die == 3))
+"%OR%" <- function(X, Y) { return(binopset(X, deparse(substitute(X)), "|", Y)) }
 
+#' Compute the logical AND of two events
+#' 
+#' @name %AND%
+#' @param X RVcond object
+#' @param Y RVcond object
+#' @return An RVresult object which is two events ANDed together
 #' @export
+#' @examples
+#' X.fair.die <- make.RV(1:6, rep("1/6",6))
+#' P((X.fair.die == 4) %AND% (X.fair.die == 3))
+"%AND%" <- function(X, Y) { return(binopset(X, deparse(substitute(X)), "&", Y)) }
+
+#' Compute the conditional probability of two events
+#' 
+#' @name Conditional
+#' @aliases |.RVresult
+#' @param vec1 an RVresult object
+#' @param vec2 an RVresult object
+#' @return An RVcond object representing the conditional probability
+#' @export
+#' @examples
+#' X.fair.die <- make.RV(1:6, rep("1/6", 6))
+#' X.fair.coin <- make.RV(1:2, rep("1/2", 2))
+#' 
+#' P(X.fair.die == 4 | X.fair.die > 3)
+#' P(X.fair.die == 5 | X.fair.die < 5)
+#' P(X.fair.die == 4 | X.fair.coin == 1) # Independence
 "|.RVresult" <- function(vec1, vec2) {
     cond1 <- (attr(vec1, "rv") == attr(vec2, "rv"))
     cond2 <- (gsub("[(=<>) 1-9]", "", paste(as.character(attr(vec1, "rv")), collapse = "")) == gsub("[(=<>) 1-9]", "", paste(as.character(attr(vec2, "rv")), collapse = "")))
+    cond3 <- P(vec2) == 0
     
-    result <- if (cond1 | cond2) P(vec1 & vec2) / P(vec2) else P(vec1)
-    if (is.nan(result)) result <- 0
+    result <- if (cond1 | cond2 | cond3) P(vec1 & vec2) / P(vec2) else P(vec1)
     class(result) <- "RVcond"
     
     return(result)
 }
 
 #' @export
-"print.RVcond" <- function(vec) {
-    return(print.default(as.numeric(vec)))
+"print.RVcond" <- function(x, ...) {
+    return(print.default(as.numeric(x)))
 }
 
 #' @export
-"print.RVresult" <- function(X) {
-    vec <- (as.logical(X))
-    names(vec) <- attr(X, "outcomes")
+"print.RVresult" <- function(x, ...) {
+    vec <- (as.logical(x))
+    names(vec) <- attr(x, "outcomes")
     
-    return(print.default(vec))
+    return(print.default(vec, ...))
 }
 
 #' Probability mass function of random variable X 
@@ -227,9 +262,6 @@ as.RV <- function(px, fractions = FALSE) {
     X
 }
 
-#' @export
-P <- function(x) UseMethod("P")
-
 #' Calculate probabilities of events
 #'
 #' @param event A logical vector, with names equal to the probabilities
@@ -241,11 +273,14 @@ P <- function(x) UseMethod("P")
 #' X.loaded.die <- make.RV(1:6, c(1,1,1,1,2,4))
 #' P(X.loaded.die>3)
 #' P(X.loaded.die==6)
+P <- function(event) UseMethod("P")
+
+#' @export
 P.default <- function(event) { sum(probs(event)[event]) }
 
 #' @export
-P.RVcond <- function(vec) {
-    return(as.numeric(vec))
+P.RVcond <- function(event) {
+    return(as.numeric(event))
 }
 
 #' Expected value of a random variable

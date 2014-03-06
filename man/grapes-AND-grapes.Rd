@@ -1,0 +1,22 @@
+\name{\%AND\%}
+\alias{\%AND\%}
+\title{Compute the logical AND of two events}
+\usage{
+X \%AND\% Y
+}
+\arguments{
+  \item{X}{RVcond object}
+
+  \item{Y}{RVcond object}
+}
+\value{
+An RVresult object which is two events ANDed together
+}
+\description{
+Compute the logical AND of two events
+}
+\examples{
+X.fair.die <- make.RV(1:6, rep("1/6",6))
+P((X.fair.die == 4) \%AND\% (X.fair.die == 3))
+}
+

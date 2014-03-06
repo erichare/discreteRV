@@ -2,7 +2,7 @@
 \alias{P}
 \title{Calculate probabilities of events}
 \usage{
-P(x, ...)
+P(event)
 }
 \arguments{
   \item{event}{A logical vector, with names equal to the

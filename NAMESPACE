@@ -1,3 +1,4 @@
+S3method("!=",RV)
 S3method("<",RV)
 S3method("<=",RV)
 S3method("==",RV)
