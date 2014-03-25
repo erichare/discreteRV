@@ -447,7 +447,7 @@ print.RV <- function(x, odds = attr(x, "odds"), fractions = attr(x, "fractions")
         
     vec <- as.numeric(names(x))
     
-    if (odds) vec <- vec / min(vec)
+    if (odds) vec <- vec / min(vec[vec > 0])
     if (fractions) {require(MASS); vec <- fractions(vec)}
     names(vec) <- x
     
