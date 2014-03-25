@@ -2,22 +2,12 @@
 \alias{SofIID}
 \title{Sum of independent identically distributed random variables}
 \usage{
-SofIID(X, n = 2, digits = 15, scipen = 10, progress = TRUE,
-  fractions = FALSE)
+SofIID(X, n = 2, progress = TRUE, fractions = FALSE)
 }
 \arguments{
   \item{X}{A random variable}
 
   \item{n}{The number of Xs to sum}
-
-  \item{digits}{number of digits of precision used in the
-  calculation. By defualt set to 15.}
-
-  \item{scipen}{A penalty to be applied when deciding to
-  print numeric values in fixed or exponential notation.
-  Positive values bias towards fixed and negative towards
-  scientific notation: fixed notation will be preferred
-  unless it is more than scipen digits wider}
 
   \item{fractions}{If TRUE, return the probabilities as
   fractions}

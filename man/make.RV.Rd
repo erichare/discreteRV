@@ -4,12 +4,14 @@
 \alias{make.RV-package}
 \title{Make a random variable consisting of possible outcome values and their probabilities or odds}
 \usage{
-make.RV(vals, probs.or.odds, fractions = FALSE)
+make.RV(outcomes, probs = NULL, odds = NULL, fractions = FALSE)
 }
 \arguments{
-  \item{vals}{vector of possible outcomes}
+  \item{outcomes}{vector of possible outcomes}
 
-  \item{probs.or.odds}{vector of probabilities or odds.}
+  \item{probs}{vector of probabilities}
+
+  \item{odds}{vector of odds}
 
   \item{fractions}{If TRUE, return the probabilities as
   fractions}
@@ -29,12 +31,12 @@ X.Bern <- make.RV(c(1,0), c(.5,.5))
 X.fair.coin <- make.RV(c(1,-1), c(.5,.5))
 
 # Make a biased coin flip game with odds 1:2 and with fair payoffs +$2 and -$1
-X.biased.coin <- make.RV(c(2,-1), c(1,2))
+X.biased.coin <- make.RV(c(2,-1), odds = c(1,2))
 
 # Make a fair die
 X.fair.die <- make.RV(1:6, rep("1/6",6))
 
 # Make a loaded die, specifying odds 1:1:1:1:2:4 rather than probabilities:
-X.loaded.die <- make.RV(1:6, c(1,1,1,1,2,4))
+X.loaded.die <- make.RV(1:6, odds = c(1,1,1,1,2,4))
 }
 

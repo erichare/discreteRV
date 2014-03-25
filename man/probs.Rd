@@ -2,19 +2,10 @@
 \alias{probs}
 \title{Probability mass function of random variable X}
 \usage{
-probs(X, scipen = 10, digits = 22)
+probs(X)
 }
 \arguments{
   \item{X}{random variable}
-
-  \item{digits}{number of digits of precision used in the
-  calculation. By defualt set to 15.}
-
-  \item{scipen}{A penalty to be applied when deciding to
-  print numeric values in fixed or exponential notation.
-  Positive values bias towards fixed and negative towards
-  scientific notation: fixed notation will be preferred
-  unless it is more than scipen digits wider}
 }
 \value{
 named vector of probablities for each element of the random
@@ -31,7 +22,7 @@ probs(X.Bern)
 X.fair.die <- make.RV(1:6, rep("1/6",6))
 probs(X.fair.die)
 
-X.loaded.die <- make.RV(1:6, c(1,1,1,1,2,4))
+X.loaded.die <- make.RV(1:6, odds = c(1,1,1,1,2,4))
 probs(X.loaded.die)
 }
 
