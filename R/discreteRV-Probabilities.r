@@ -216,9 +216,7 @@ mult <- function(X, Y, sep=",", fractions=FALSE) {
     
     attr(S, "fractions") <- fractions
     attr(S, "odds") <- FALSE
-    
-    if (fractions) {require(MASS); names(S) <- fractions(as.numeric(names(S)))}
-    
+
     return(S)
 }
 
@@ -247,9 +245,7 @@ multN <- function(X, n=2, sep=",", fractions=FALSE) {
     
     attr(S, "fractions") <- fractions
     attr(S, "odds") <- FALSE
-    
-    if (fractions) {require(MASS); names(S) <- fractions(as.numeric(names(S)))}
-    
+
     return(S)
 }
 
@@ -264,7 +260,6 @@ as.RV <- function(px, fractions = FALSE) {
     X <- as.numeric(names(px))
     
     names(X) <- px
-    if (fractions) {require(MASS); names(X) <- fractions(as.numeric(names(X)))}
     class(X) <- "RV"
     
     attr(X, "fractions") <- fractions
@@ -366,10 +361,6 @@ SofI <- function(..., fractions=FALSE) {
         LIST <- LIST[-1]
     }
     class(S) <- "RV"
-    if (fractions) {
-        require(MASS)
-        names(S) <- fractions(as.numeric(names(S)))
-    }
     
     attr(S, "fractions") <- fractions
     attr(S, "odds") <- FALSE
@@ -403,10 +394,6 @@ SofIID <- function(X, n=2, progress=TRUE, fractions=FALSE) {
     close(pb)
     
     class(S) <- "RV"
-    if (fractions) {
-        require(MASS)
-        names(S) <- fractions(as.numeric(names(S)))
-    }
     
     attr(S, "fractions") <- fractions
     attr(S, "odds") <- FALSE
