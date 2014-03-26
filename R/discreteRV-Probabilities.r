@@ -6,6 +6,8 @@
 #' @param probs vector of probabilities
 #' @param odds vector of odds
 #' @param fractions If TRUE, return the probabilities as fractions
+#' @param range If TRUE, outcomes specify a range of values in the form c(lower, upper)
+#' @param tol Any value below this level will be treated as zero probability
 #' @return random variable as RV object.
 #' @export
 #' @examples
@@ -23,7 +25,22 @@
 #' 
 #' # Make a loaded die, specifying odds 1:1:1:1:2:4 rather than probabilities:
 #' X.loaded.die <- make.RV(1:6, odds = c(1,1,1,1,2,4))
-make.RV <- function(outcomes, probs = NULL, odds = NULL, fractions = FALSE) {
+make.RV <- function(outcomes, probs = NULL, odds = NULL, fractions = FALSE, range = FALSE, tol = 1e-10) {
+    if (range) {
+        curr <- outcomes[1]
+        end <- outcomes[2]
+        
+        pr <- NULL
+        while (probs(curr) > tol & length(pr) <= end) {
+            pr <- c(pr, probs(curr))
+            curr <- curr + 1
+        }
+        
+        probs <- pr
+        outcomes <- outcomes[1]:(length(pr) + outcomes[1] - 1)
+        if (max(outcomes) == end) range <- FALSE
+    }
+    
     pr <- probs
     if (is.null(pr)) pr <- odds
     
@@ -51,9 +68,9 @@ make.RV <- function(outcomes, probs = NULL, odds = NULL, fractions = FALSE) {
     class(outcomes) <- "RV"
     
     attr(outcomes, "odds") <- isOdds
-    attr(outcomes, "fractions") <- FALSE
-    if (fractions) attr(outcomes, "fractions") <- TRUE
-    
+    attr(outcomes, "fractions") <- fractions
+    attr(outcomes, "range") <- range
+
     return(outcomes)
 } 
 
@@ -216,6 +233,7 @@ mult <- function(X, Y, sep=",", fractions=FALSE) {
     
     attr(S, "fractions") <- fractions
     attr(S, "odds") <- FALSE
+    attr(S, "range") <- attr(X, "range")
 
     return(S)
 }
@@ -245,6 +263,7 @@ multN <- function(X, n=2, sep=",", fractions=FALSE) {
     
     attr(S, "fractions") <- fractions
     attr(S, "odds") <- FALSE
+    attr(S, "range") <- attr(X, "range")
 
     return(S)
 }
@@ -264,6 +283,7 @@ as.RV <- function(px, fractions = FALSE) {
     
     attr(X, "fractions") <- fractions
     attr(X, "odds") <- FALSE
+    attr(X, "range") <- FALSE
     
     X
 }
@@ -364,6 +384,7 @@ SofI <- function(..., fractions=FALSE) {
     
     attr(S, "fractions") <- fractions
     attr(S, "odds") <- FALSE
+    attr(S, "range") <- attr(list(...)[[1]], "range")
     
     return(S)
 }
@@ -397,6 +418,7 @@ SofIID <- function(X, n=2, progress=TRUE, fractions=FALSE) {
     
     attr(S, "fractions") <- fractions
     attr(S, "odds") <- FALSE
+    attr(S, "range") <- attr(X, "range")
     
     return(S)
 }
@@ -463,6 +485,8 @@ print.RV <- function(x, odds = attr(x, "odds"), fractions = attr(x, "fractions")
     df <- eval(parse(text = paste("data.frame(Outcomes = as.character(x), ", type, " = vec)", sep = "")))
     
     print(df, row.names = FALSE, ...)
+    
+    if (attr(x, "range")) cat(paste("\nOutcomes not listed are assumed to occur with zero probability\n"))
 }
 
 #' Normal quantile plot for RVs to answer the question how close to normal it is

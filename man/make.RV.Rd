@@ -4,7 +4,8 @@
 \alias{make.RV-package}
 \title{Make a random variable consisting of possible outcome values and their probabilities or odds}
 \usage{
-make.RV(outcomes, probs = NULL, odds = NULL, fractions = FALSE)
+make.RV(outcomes, probs = NULL, odds = NULL, fractions = FALSE,
+  range = FALSE, tol = 1e-10)
 }
 \arguments{
   \item{outcomes}{vector of possible outcomes}
@@ -15,6 +16,12 @@ make.RV(outcomes, probs = NULL, odds = NULL, fractions = FALSE)
 
   \item{fractions}{If TRUE, return the probabilities as
   fractions}
+
+  \item{range}{If TRUE, outcomes specify a range of values
+  in the form c(lower, upper)}
+
+  \item{tol}{Any value below this level will be treated as
+  zero probability}
 }
 \value{
 random variable as RV object.
