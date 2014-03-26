@@ -10,7 +10,8 @@ make.RV(outcomes, probs = NULL, odds = NULL, fractions = FALSE,
 \arguments{
   \item{outcomes}{vector of possible outcomes}
 
-  \item{probs}{vector of probabilities}
+  \item{probs}{vector of probabilities or function defining
+  probabilities}
 
   \item{odds}{vector of odds}
 

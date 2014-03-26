@@ -3,7 +3,7 @@
 #' @name make.RV
 #' @docType package
 #' @param outcomes vector of possible outcomes
-#' @param probs vector of probabilities
+#' @param probs vector of probabilities or function defining probabilities
 #' @param odds vector of odds
 #' @param fractions If TRUE, return the probabilities as fractions
 #' @param range If TRUE, outcomes specify a range of values in the form c(lower, upper)
