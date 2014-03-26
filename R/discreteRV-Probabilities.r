@@ -26,13 +26,20 @@
 #' # Make a loaded die, specifying odds 1:1:1:1:2:4 rather than probabilities:
 #' X.loaded.die <- make.RV(1:6, odds = c(1,1,1,1,2,4))
 make.RV <- function(outcomes, probs = NULL, odds = NULL, fractions = FALSE, range = FALSE, tol = 1e-10) {
-    if (range) {
+    if (range & is.finite(outcomes[2])) outcomes <- outcomes[1]:outcomes[2]
+    if (class(probs) == "function") {
         curr <- outcomes[1]
         end <- outcomes[2]
         
         pr <- NULL
         while (probs(curr) > tol & length(pr) <= end) {
             pr <- c(pr, probs(curr))
+            
+            if (sum(pr) > 1) {
+                pr <- pr[-length(pr)]
+                break;
+            }
+            
             curr <- curr + 1
         }
         
