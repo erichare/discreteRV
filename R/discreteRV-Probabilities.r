@@ -1,3 +1,50 @@
+exploreOutcomes <- function(outcomes, probs, tol = 1e-14) {
+    final.outcomes <- NULL
+    
+    if (!is.finite(outcomes[1]) & !is.finite(outcomes[2])) {
+        curr <- 0
+        out <- NULL
+        
+        while (probs(curr) > tol) {
+            out <- c(out, curr)
+            curr <- curr + 1
+        }
+        
+        curr <- -1
+        
+        while (probs(curr) > tol) {
+            out <- c(out, curr)
+            curr <- curr - 1
+        }
+        
+        final.outcomes <- out
+    } else if (!is.finite(outcomes[2])) {
+        curr <- outcomes[1]
+        out <- NULL
+        
+        while (probs(curr) > tol) {
+            out <- c(out, curr)
+            curr <- curr + 1
+        }
+        
+        final.outcomes <- out
+    } else if (!is.finite(outcomes[1])) {
+        curr <- outcomes[2]
+        out <- NULL
+        
+        while (probs(curr) > tol) {
+            out <- c(out, curr)
+            curr <- curr - 1
+        }
+        
+        final.outcomes <- out
+    } else {
+        final.outcomes <- outcomes[1]:outcomes[2]
+    }
+    
+    return(final.outcomes)
+}
+
 #' Make a random variable consisting of possible outcome values and their probabilities or odds
 #' 
 #' @name make.RV
@@ -25,37 +72,22 @@
 #' 
 #' # Make a loaded die, specifying odds 1:1:1:1:2:4 rather than probabilities:
 #' X.loaded.die <- make.RV(1:6, odds = c(1,1,1,1,2,4))
-make.RV <- function(outcomes, probs = NULL, odds = NULL, fractions = FALSE, range = FALSE, tol = 1e-10) {
-    if (range & is.finite(outcomes[2])) outcomes <- outcomes[1]:outcomes[2]
-    if (class(probs) == "function") {
-        curr <- outcomes[1]
-        end <- outcomes[2]
-        
-        pr <- NULL
-        while (probs(curr) > tol & length(pr) <= end) {
-            pr <- c(pr, probs(curr))
-            
-            if (sum(pr) > 1) {
-                pr <- pr[-length(pr)]
-                break;
-            }
-            
-            curr <- curr + 1
-        }
-        
-        probs <- pr
-        outcomes <- outcomes[1]:(length(pr) + outcomes[1] - 1)
-        if (max(outcomes) == end) range <- FALSE
-    }
+#' 
+#' # Make a Poisson random variable
+#' pois.func <- function(x, lambda = 5) { lambda^x * exp(-lambda) / factorial(x) }
+#' X.pois <- make.RV(c(0, Inf), pois.func, range = TRUE)
+make.RV <- function(outcomes, probs = NULL, odds = NULL, fractions = FALSE, range = FALSE, tol = 1e-14) {
+    
+    if (range) outcomes <- exploreOutcomes(outcomes, probs, tol)
+    if (class(probs) == "function") probs <- probs(outcomes)
     
     pr <- probs
     if (is.null(pr)) pr <- odds
-    
     pr <- sapply(pr, function(pstr) eval(parse(text=pstr)));
     
     probsSum <- sum(pr)
     
-    if (probsSum > 1 & is.null(odds)) stop("Probabilities sum to over 1")
+    if (probsSum > 1 + tol & is.null(odds)) stop("Probabilities sum to over 1")
     if (any(pr < 0)) stop("Probabilities cannot be negative")
     
     isOdds <- !is.null(odds)
@@ -68,12 +100,15 @@ make.RV <- function(outcomes, probs = NULL, odds = NULL, fractions = FALSE, rang
         pr <- c(pr, rep(ifelse(isOdds, 1, (1 - probsSum) / (length(outcomes) - length(pr))), length(outcomes) - length(pr)))
     }
     
+    if (!isOdds & (sum(pr) < 1 - tol | sum(pr) > 1 + tol)) stop("Probabilities specified do not sum to one.")
+    
     ## Convert to probs
     probs <- pr / sum(pr)
     
-    names(outcomes) <- probs
+    ## Force a certain precision
     class(outcomes) <- "RV"
     
+    attr(outcomes, "probs") <- probs
     attr(outcomes, "odds") <- isOdds
     attr(outcomes, "fractions") <- fractions
     attr(outcomes, "range") <- range
@@ -106,6 +141,7 @@ unopset <- function(X, Xchar, cond, x) {
     
     attr(result, "outcomes") <- as.vector(X)
     attr(result, "rv") <- Xchar
+    attr(result, "probs") <- probs(X)
     
     return(result)
 }
@@ -116,9 +152,8 @@ binopset <- function(X, Xchar, cond, Y) {
     
     attr(result, "outcomes") <- attr(X, "outcomes")
     attr(result, "rv") <- Xchar
-    
-    names(result) <- probs(X)
-    
+    attr(result, "probs") <- probs(X)
+        
     return(result)
 }
 
@@ -179,8 +214,9 @@ binopset <- function(X, Xchar, cond, Y) {
     cond2 <- (gsub("[(=<>) 1-9]", "", paste(as.character(attr(vec1, "rv")), collapse = "")) == gsub("[(=<>) 1-9]", "", paste(as.character(attr(vec2, "rv")), collapse = "")))
     cond3 <- P(vec2) == 0
     
-    result <- if (cond1 | cond2 | cond3) P(vec1 & vec2) / P(vec2) else P(vec1)
+    result <- if (cond1 | cond2 | cond3) P(vec1 %AND% vec2) / P(vec2) else P(vec1)
     class(result) <- "RVcond"
+    attr(result, "probs") <- attr(vec1, "probs")
     
     return(result)
 }
@@ -215,7 +251,7 @@ binopset <- function(X, Xchar, cond, Y) {
 #' X.loaded.die <- make.RV(1:6, odds = c(1,1,1,1,2,4))
 #' probs(X.loaded.die)
 probs <- function(X) { 
-    return(as.numeric(names(X)))
+    return(attr(X, "probs"))
 }
 
 #' Joint probability mass function of random variables X and Y
@@ -234,10 +270,10 @@ mult <- function(X, Y, sep=",", fractions=FALSE) {
     S <- X
     tmp <- tapply(outer(probs(S), probs(Y), FUN="*"),
                   outer(S, Y, FUN="paste", sep=sep), paste, sep=sep)
-    S <- as.character(names(tmp))
-    names(S) <- as.numeric(tmp)
+    S <- names(tmp)
     class(S) <- "RV"
     
+    attr(S, "probs") <- as.numeric(tmp)
     attr(S, "fractions") <- fractions
     attr(S, "odds") <- FALSE
     attr(S, "range") <- attr(X, "range")
@@ -262,8 +298,8 @@ multN <- function(X, n=2, sep=",", fractions=FALSE) {
     while(i<=n) {
         tmp <- tapply(outer(probs(S), probs(X), FUN="*"),
                       outer(S, X, FUN="paste", sep=sep), paste, sep=sep)
-        S <- as.character(names(tmp))
-        names(S) <- as.numeric(tmp)
+        S <- names(tmp)
+        attr(S, "probs") <- as.numeric(tmp)
         i <- i+1
     }
     class(S) <- "RV"
@@ -285,9 +321,9 @@ multN <- function(X, n=2, sep=",", fractions=FALSE) {
 as.RV <- function(px, fractions = FALSE) {
     X <- as.numeric(names(px))
     
-    names(X) <- px
     class(X) <- "RV"
     
+    attr(X, "probs") <- px
     attr(X, "fractions") <- fractions
     attr(X, "odds") <- FALSE
     attr(X, "range") <- FALSE
@@ -297,7 +333,7 @@ as.RV <- function(px, fractions = FALSE) {
 
 #' Calculate probabilities of events
 #'
-#' @param event A logical vector, with names equal to the probabilities
+#' @param event A logical vector
 #' @export
 #' @examples
 #' X.fair.die <- make.RV(1:6, rep("1/6",6))
@@ -306,15 +342,13 @@ as.RV <- function(px, fractions = FALSE) {
 #' X.loaded.die <- make.RV(1:6, odds = c(1,1,1,1,2,4))
 #' P(X.loaded.die>3)
 #' P(X.loaded.die==6)
-P <- function(event) UseMethod("P")
+P <- function(event) { UseMethod("P") } 
 
 #' @export
-P.default <- function(event) { sum(probs(event)[event]) }
+P.default <- function(event) { sum(attr(event, "probs")[event]) }
 
 #' @export
-P.RVcond <- function(event) {
-    return(as.numeric(event))
-}
+P.RVcond <- function(event) { return(event) }
 
 #' Expected value of a random variable
 #' 
@@ -375,7 +409,7 @@ KURT <- function(X) { E((X-E(X))^4)/V(X)^2 }
 #' 
 #' S5 <- SofI(X.Bern, X.Bern, X.Bern, X.Bern, X.Bern)  
 #' S.mix <- SofI(X.Bern, X.fair.die)  # Independent but not IID
-SofI <- function(..., fractions=FALSE) {
+SofI <- function(..., fractions=attr(list(...)[[1]], "fractions")) {
     LIST <- list(...)
     S <- LIST[[1]]
     LIST <- LIST[-1]
@@ -384,7 +418,7 @@ SofI <- function(..., fractions=FALSE) {
         tmp <- tapply(outer(probs(S), probs(X), FUN="*"),
                       outer(S,        X,        FUN="+"), sum)
         S <- as.numeric(names(tmp))  
-        names(S) <- format(tmp)
+        attr(S, "probs") <- tmp
         LIST <- LIST[-1]
     }
     class(S) <- "RV"
@@ -408,14 +442,14 @@ SofI <- function(..., fractions=FALSE) {
 #' 
 #' S5 <- SofIID(X.Bern, 5)
 #' S128 <- SofIID(X.Bern, 128)
-SofIID <- function(X, n=2, progress=TRUE, fractions=FALSE) {
+SofIID <- function(X, n=2, progress=TRUE, fractions=attr(X, "fractions")) {
     S <- X;  i <- 2
     pb <- txtProgressBar(min = 1, max = n)
     while(i<=n) {
         tmp <- tapply(outer(probs(S), probs(X), FUN="*"),
                       outer(S,        X,        FUN="+"), sum)
         S <- as.numeric(names(tmp))  
-        names(S) <- format(tmp)
+        attr(S, "probs") <- tmp
         if(i%%100==0 & progress) setTxtProgressBar(pb, i)
         i <- i+1
     };
@@ -479,7 +513,7 @@ print.RV <- function(x, odds = attr(x, "odds"), fractions = attr(x, "fractions")
     attributes(x)$class <- NULL
     cat(paste("random variable with", length(x), "outcomes\n\n"))
         
-    vec <- as.numeric(names(x))
+    vec <- attr(x, "probs")
     
     if (odds) vec <- vec / min(vec[vec > 0])
     if (fractions) {require(MASS); vec <- fractions(vec)}
@@ -512,8 +546,8 @@ print.RV <- function(x, odds = attr(x, "odds"), fractions = attr(x, "fractions")
 #' qqnorm(fair.die)
 qqnorm.RV <- function(y, ..., pch=16, cex=.5, add=FALSE, 
                       xlab="Normal Quantiles", ylab="Random Variable Quantiles") {
-    y <- sort(y[probs(y)>0])
     pc <- cumsum(probs(y))
+    y <- sort(y[probs(y)>0])
     if(!add) {
         plot(qnorm(pc), y, pch=pch, cex=cex, xlab=xlab, ylab=ylab, ...)
     } else {

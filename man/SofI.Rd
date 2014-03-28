@@ -2,7 +2,7 @@
 \alias{SofI}
 \title{Sum of independent random variables}
 \usage{
-SofI(..., fractions = FALSE)
+SofI(..., fractions = attr(list(...)[[1]], "fractions"))
 }
 \arguments{
   \item{...}{Arbitrary number of random variables}

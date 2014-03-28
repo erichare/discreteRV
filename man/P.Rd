@@ -5,8 +5,7 @@
 P(event)
 }
 \arguments{
-  \item{event}{A logical vector, with names equal to the
-  probabilities}
+  \item{event}{A logical vector}
 }
 \description{
 Calculate probabilities of events

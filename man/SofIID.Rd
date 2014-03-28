@@ -2,7 +2,7 @@
 \alias{SofIID}
 \title{Sum of independent identically distributed random variables}
 \usage{
-SofIID(X, n = 2, progress = TRUE, fractions = FALSE)
+SofIID(X, n = 2, progress = TRUE, fractions = attr(X, "fractions"))
 }
 \arguments{
   \item{X}{A random variable}

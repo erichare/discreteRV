@@ -5,7 +5,7 @@
 \title{Make a random variable consisting of possible outcome values and their probabilities or odds}
 \usage{
 make.RV(outcomes, probs = NULL, odds = NULL, fractions = FALSE,
-  range = FALSE, tol = 1e-10)
+  range = FALSE, tol = 1e-14)
 }
 \arguments{
   \item{outcomes}{vector of possible outcomes}
@@ -46,5 +46,9 @@ X.fair.die <- make.RV(1:6, rep("1/6",6))
 
 # Make a loaded die, specifying odds 1:1:1:1:2:4 rather than probabilities:
 X.loaded.die <- make.RV(1:6, odds = c(1,1,1,1,2,4))
+
+# Make a Poisson random variable
+pois.func <- function(x, lambda = 5) { lambda^x * exp(-lambda) / factorial(x) }
+X.pois <- make.RV(c(0, Inf), pois.func, range = TRUE)
 }
 
