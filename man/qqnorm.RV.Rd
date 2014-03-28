@@ -4,7 +4,7 @@
 \usage{
 \method{qqnorm}{RV}(y, ..., pch = 16, cex = 0.5, add = FALSE,
   xlab = "Normal Quantiles", ylab = "Random Variable Quantiles",
-  tol = 1e-14)
+  tol = 1e-10)
 }
 \arguments{
   \item{y}{A random variable}
@@ -34,7 +34,7 @@ Normal quantile plot for RVs to answer the question how
 close to normal it is
 }
 \examples{
-fair.die <- make.RV(1:6, rep("1/6",6))
+fair.die <- make.RV(1:6, rep(1/6,6))
 qqnorm(fair.die)
 }
 

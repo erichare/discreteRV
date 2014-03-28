@@ -1,4 +1,4 @@
-exploreOutcomes <- function(outcomes, probs, tol = 1e-14) {
+exploreOutcomes <- function(outcomes, probs, tol = 1e-10) {
     final.outcomes <- NULL
     
     if (!is.finite(outcomes[1]) & !is.finite(outcomes[2])) {
@@ -68,7 +68,7 @@ exploreOutcomes <- function(outcomes, probs, tol = 1e-14) {
 #' X.biased.coin <- make.RV(c(2,-1), odds = c(1,2))
 #' 
 #' # Make a fair die
-#' X.fair.die <- make.RV(1:6, rep("1/6",6))
+#' X.fair.die <- make.RV(1:6, rep(1/6, 6), fractions = TRUE)
 #' 
 #' # Make a loaded die, specifying odds 1:1:1:1:2:4 rather than probabilities:
 #' X.loaded.die <- make.RV(1:6, odds = c(1,1,1,1,2,4))
@@ -76,14 +76,13 @@ exploreOutcomes <- function(outcomes, probs, tol = 1e-14) {
 #' # Make a Poisson random variable
 #' pois.func <- function(x, lambda = 5) { lambda^x * exp(-lambda) / factorial(x) }
 #' X.pois <- make.RV(c(0, Inf), pois.func, range = TRUE)
-make.RV <- function(outcomes, probs = NULL, odds = NULL, fractions = FALSE, range = FALSE, tol = 1e-14) {
+make.RV <- function(outcomes, probs = NULL, odds = NULL, fractions = FALSE, range = FALSE, tol = 1e-10) {
     
     if (range) outcomes <- exploreOutcomes(outcomes, probs, tol)
     if (class(probs) == "function") probs <- probs(outcomes)
     
     pr <- probs
     if (is.null(pr)) pr <- odds
-    pr <- sapply(pr, function(pstr) eval(parse(text=pstr)));
     
     probsSum <- sum(pr)
     
@@ -179,7 +178,7 @@ binopset <- function(X, Xchar, cond, Y) {
 #' @return An RVresult object which is two events ORed together
 #' @export
 #' @examples
-#' X.fair.die <- make.RV(1:6, rep("1/6",6))
+#' X.fair.die <- make.RV(1:6, rep(1/6,6))
 #' P((X.fair.die == 4) %OR% (X.fair.die == 3))
 "%OR%" <- function(X, Y) { return(binopset(X, deparse(substitute(X)), "|", Y)) }
 
@@ -191,7 +190,7 @@ binopset <- function(X, Xchar, cond, Y) {
 #' @return An RVresult object which is two events ANDed together
 #' @export
 #' @examples
-#' X.fair.die <- make.RV(1:6, rep("1/6",6))
+#' X.fair.die <- make.RV(1:6, rep(1/6,6))
 #' P((X.fair.die == 4) %AND% (X.fair.die == 3))
 "%AND%" <- function(X, Y) { return(binopset(X, deparse(substitute(X)), "&", Y)) }
 
@@ -204,8 +203,8 @@ binopset <- function(X, Xchar, cond, Y) {
 #' @return An RVcond object representing the conditional probability
 #' @export
 #' @examples
-#' X.fair.die <- make.RV(1:6, rep("1/6", 6))
-#' X.fair.coin <- make.RV(1:2, rep("1/2", 2))
+#' X.fair.die <- make.RV(1:6, rep(1/6, 6))
+#' X.fair.coin <- make.RV(1:2, rep(1/2, 2))
 #' 
 #' P(X.fair.die == 4 | X.fair.die > 3)
 #' P(X.fair.die == 5 | X.fair.die < 5)
@@ -246,7 +245,7 @@ binopset <- function(X, Xchar, cond, Y) {
 #' X.Bern <- make.RV(c(1,0), c(.5,.5))
 #' probs(X.Bern)
 #' 
-#' X.fair.die <- make.RV(1:6, rep("1/6",6))
+#' X.fair.die <- make.RV(1:6, rep(1/6,6))
 #' probs(X.fair.die)
 #' 
 #' X.loaded.die <- make.RV(1:6, odds = c(1,1,1,1,2,4))
@@ -337,7 +336,7 @@ as.RV <- function(px, fractions = FALSE) {
 #' @param event A logical vector
 #' @export
 #' @examples
-#' X.fair.die <- make.RV(1:6, rep("1/6",6))
+#' X.fair.die <- make.RV(1:6, rep(1/6,6))
 #' P(X.fair.die>3)
 #' 
 #' X.loaded.die <- make.RV(1:6, odds = c(1,1,1,1,2,4))
@@ -359,7 +358,7 @@ P.RVcond <- function(event) { return(event) }
 #' X.Bern <- make.RV(c(1,0), c(.5,.5))
 #' E(X.Bern)
 #' 
-#' X.fair.die <- make.RV(1:6, rep("1/6",6))
+#' X.fair.die <- make.RV(1:6, rep(1/6,6))
 #' E(X.fair.die)
 E <- function(X) { sum(X*probs(X)) }
 
@@ -406,7 +405,7 @@ KURT <- function(X) { E((X-E(X))^4)/V(X)^2 }
 #' @export
 #' @examples
 #' X.Bern <- make.RV(c(1,0), c(.5,.5))
-#' X.fair.die <- make.RV(1:6, rep("1/6",6))
+#' X.fair.die <- make.RV(1:6, rep(1/6,6))
 #' 
 #' S5 <- SofI(X.Bern, X.Bern, X.Bern, X.Bern, X.Bern)  
 #' S.mix <- SofI(X.Bern, X.fair.die)  # Independent but not IID
@@ -484,7 +483,7 @@ SofIID <- function(X, n=2, progress=TRUE, fractions=attr(X, "fractions")) {
 #' @param ylim Lower and upper limit for the y axis
 #' @export
 #' @examples
-#' fair.die <- make.RV(1:6, rep("1/6",6))
+#' fair.die <- make.RV(1:6, rep(1/6,6))
 #' plot(fair.die)
 plot.RV <- function(x, ..., pch=16, cex=1.2, lwd=2, col="black",
                     stretch.x=1.2, stretch.y=1.2,
@@ -510,7 +509,7 @@ plot.RV <- function(x, ..., pch=16, cex=1.2, lwd=2, col="black",
 #' @param ... Additional arguments to be passed to the "print" function
 #' @export
 #' @examples
-#' fair.die <- make.RV(1:6, rep("1/6",6))
+#' fair.die <- make.RV(1:6, rep(1/6,6))
 #' print(fair.die)
 print.RV <- function(x, odds = attr(x, "odds"), fractions = attr(x, "fractions"), ...) {
     attributes(x)$class <- NULL
@@ -546,9 +545,9 @@ print.RV <- function(x, odds = attr(x, "odds"), fractions = attr(x, "fractions")
 #' @param tol tolerance for the zero probability case
 #' @export
 #' @examples
-#' fair.die <- make.RV(1:6, rep("1/6",6))
+#' fair.die <- make.RV(1:6, rep(1/6,6))
 #' qqnorm(fair.die)
-qqnorm.RV <- function(y, ..., pch=16, cex=.5, add=FALSE, xlab="Normal Quantiles", ylab="Random Variable Quantiles", tol = 1e-14) {
+qqnorm.RV <- function(y, ..., pch=16, cex=.5, add=FALSE, xlab="Normal Quantiles", ylab="Random Variable Quantiles", tol = 1e-10) {
     ind <- which(probs(y) > tol)
     outcomes <- sort(y[ind])
     pc <- cumsum(probs(y))[ind]
