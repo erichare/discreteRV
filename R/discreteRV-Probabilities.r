@@ -104,11 +104,12 @@ make.RV <- function(outcomes, probs = NULL, odds = NULL, fractions = FALSE, rang
     
     ## Convert to probs
     probs <- pr / sum(pr)
+    names(probs) <- outcomes
     
     ## Force a certain precision
     class(outcomes) <- "RV"
     
-    attr(outcomes, "probs") <- as.numeric(probs)
+    attr(outcomes, "probs") <- probs
     attr(outcomes, "odds") <- isOdds
     attr(outcomes, "fractions") <- fractions
     attr(outcomes, "range") <- range
@@ -448,8 +449,10 @@ SofIID <- function(X, n=2, progress=TRUE, fractions=attr(X, "fractions")) {
     while(i<=n) {
         tmp <- tapply(outer(probs(S), probs(X), FUN="*"),
                       outer(S,        X,        FUN="+"), sum)
+        
         S <- as.numeric(names(tmp))  
         attr(S, "probs") <- tmp
+        
         if(i%%100==0 & progress) setTxtProgressBar(pb, i)
         i <- i+1
     };
@@ -546,12 +549,14 @@ print.RV <- function(x, odds = attr(x, "odds"), fractions = attr(x, "fractions")
 #' fair.die <- make.RV(1:6, rep("1/6",6))
 #' qqnorm(fair.die)
 qqnorm.RV <- function(y, ..., pch=16, cex=.5, add=FALSE, xlab="Normal Quantiles", ylab="Random Variable Quantiles", tol = 1e-14) {
-    pc <- cumsum(probs(y))
-    y <- sort(y[probs(y) > 0 + tol])
-    if(!add) {
-        plot(qnorm(pc), y, pch=pch, cex=cex, xlab=xlab, ylab=ylab, ...)
+    ind <- which(probs(y) > tol)
+    outcomes <- sort(y[ind])
+    pc <- cumsum(probs(y))[ind]
+    
+    if (!add) {
+        plot(qnorm(pc), outcomes, pch=pch, cex=cex, xlab=xlab, ylab=ylab, ...)
     } else {
-        points(qnorm(pc), y, pch=pch, cex=cex, ...)
+        points(qnorm(pc), outcomes, pch=pch, cex=cex, ...)
     }
 }
 
