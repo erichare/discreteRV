@@ -99,8 +99,6 @@ make.RV <- function(outcomes, probs = NULL, odds = NULL, fractions = FALSE, rang
         pr <- c(pr, rep(ifelse(isOdds, 1, (1 - probsSum) / (length(outcomes) - length(pr))), length(outcomes) - length(pr)))
     }
     
-    if (!isOdds & (sum(pr) < 1 - tol | sum(pr) > 1 + tol)) stop("Probabilities specified do not sum to one.")
-    
     ## Convert to probs
     probs <- pr / sum(pr)
     names(probs) <- outcomes
