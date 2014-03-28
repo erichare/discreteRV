@@ -108,7 +108,7 @@ make.RV <- function(outcomes, probs = NULL, odds = NULL, fractions = FALSE, rang
     ## Force a certain precision
     class(outcomes) <- "RV"
     
-    attr(outcomes, "probs") <- probs
+    attr(outcomes, "probs") <- as.numeric(probs)
     attr(outcomes, "odds") <- isOdds
     attr(outcomes, "fractions") <- fractions
     attr(outcomes, "range") <- range
