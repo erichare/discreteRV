@@ -94,8 +94,6 @@ make.RV <- function(outcomes, probs = NULL, odds = NULL, fractions = FALSE, rang
     if (length(outcomes) < length(pr)) {
         stop("More probabilities/odds than outcomes provided")
     } else if (length(outcomes) > length(pr)) {
-        warning("Some outcomes have no probabilities or odds specified: Defaulting to uniform")
-        
         pr <- c(pr, rep(ifelse(isOdds, 1, (1 - probsSum) / (length(outcomes) - length(pr))), length(outcomes) - length(pr)))
     }
     
