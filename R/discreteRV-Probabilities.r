@@ -540,14 +540,14 @@ print.RV <- function(x, odds = attr(x, "odds"), fractions = attr(x, "fractions")
 #' @param add A logical indicating whether to add to an existing plot
 #' @param xlab Label for the X axis
 #' @param ylab Label for the Y axis
+#' @param tol tolerance for the zero probability case
 #' @export
 #' @examples
 #' fair.die <- make.RV(1:6, rep("1/6",6))
 #' qqnorm(fair.die)
-qqnorm.RV <- function(y, ..., pch=16, cex=.5, add=FALSE, 
-                      xlab="Normal Quantiles", ylab="Random Variable Quantiles") {
+qqnorm.RV <- function(y, ..., pch=16, cex=.5, add=FALSE, xlab="Normal Quantiles", ylab="Random Variable Quantiles", tol = 1e-14) {
     pc <- cumsum(probs(y))
-    y <- sort(y[probs(y)>0])
+    y <- sort(y[probs(y) > 0 + tol])
     if(!add) {
         plot(qnorm(pc), y, pch=pch, cex=cex, xlab=xlab, ylab=ylab, ...)
     } else {

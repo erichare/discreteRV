@@ -3,7 +3,8 @@
 \title{Normal quantile plot for RVs to answer the question how close to normal it is}
 \usage{
 \method{qqnorm}{RV}(y, ..., pch = 16, cex = 0.5, add = FALSE,
-  xlab = "Normal Quantiles", ylab = "Random Variable Quantiles")
+  xlab = "Normal Quantiles", ylab = "Random Variable Quantiles",
+  tol = 1e-14)
 }
 \arguments{
   \item{y}{A random variable}
@@ -25,6 +26,8 @@
   \item{xlab}{Label for the X axis}
 
   \item{ylab}{Label for the Y axis}
+
+  \item{tol}{tolerance for the zero probability case}
 }
 \description{
 Normal quantile plot for RVs to answer the question how
