@@ -523,7 +523,14 @@ print.RV <- function(x, odds = attr(x, "odds"), fractions = attr(x, "fractions")
     
     df <- eval(parse(text = paste("data.frame(Outcomes = as.character(x), ", type, " = vec)", sep = "")))
     
-    print(df, row.names = FALSE, ...)
+    if (nrow(df) > 10) {
+        print(df, row.names = FALSE, ...)
+    } else {
+        vec <- as.character(df[,type])
+        names(vec) <- df[,"Outcomes"]
+        
+        print(vec, quote = FALSE, ...)
+    }
     
     if (attr(x, "range")) cat(paste("\nOutcomes not listed are assumed to occur with zero probability\n"))
 }
