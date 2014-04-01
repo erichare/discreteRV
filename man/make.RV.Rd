@@ -4,8 +4,8 @@
 \alias{make.RV-package}
 \title{Make a random variable consisting of possible outcome values and their probabilities or odds}
 \usage{
-make.RV(outcomes, probs = NULL, odds = NULL, fractions = FALSE,
-  range = FALSE, tol = 1e-10)
+make.RV(outcomes, probs = NULL, odds = NULL, fractions = (class(probs) !=
+  "function"), range = any(is.infinite(outcomes)))
 }
 \arguments{
   \item{outcomes}{vector of possible outcomes}
@@ -16,13 +16,10 @@ make.RV(outcomes, probs = NULL, odds = NULL, fractions = FALSE,
   \item{odds}{vector of odds}
 
   \item{fractions}{If TRUE, return the probabilities as
-  fractions}
+  fractions when printing}
 
   \item{range}{If TRUE, outcomes specify a range of values
   in the form c(lower, upper)}
-
-  \item{tol}{Any value below this level will be treated as
-  zero probability}
 }
 \value{
 random variable as RV object.
@@ -42,13 +39,13 @@ X.fair.coin <- make.RV(c(1,-1), c(.5,.5))
 X.biased.coin <- make.RV(c(2,-1), odds = c(1,2))
 
 # Make a fair die
-X.fair.die <- make.RV(1:6, rep(1/6, 6), fractions = TRUE)
+X.fair.die <- make.RV(1:6, 1/6)
 
 # Make a loaded die, specifying odds 1:1:1:1:2:4 rather than probabilities:
 X.loaded.die <- make.RV(1:6, odds = c(1,1,1,1,2,4))
 
 # Make a Poisson random variable
 pois.func <- function(x, lambda = 5) { lambda^x * exp(-lambda) / factorial(x) }
-X.pois <- make.RV(c(0, Inf), pois.func, range = TRUE)
+X.pois <- make.RV(c(0, Inf), pois.func)
 }
 

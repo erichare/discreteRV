@@ -3,7 +3,7 @@
 \title{Turn a probability vector with possible outcome values in the 'names()' attribute
 into a random variable:}
 \usage{
-as.RV(px, fractions = FALSE)
+as.RV(px, fractions = TRUE)
 }
 \arguments{
   \item{px}{A probability vector with possible outcome

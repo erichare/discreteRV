@@ -2,7 +2,7 @@
 \alias{multN}
 \title{Probability mass function of  X^n}
 \usage{
-multN(X, n = 2, sep = ",", fractions = FALSE)
+multN(X, n = 2, sep = ",", fractions = attr(X, "fractions"))
 }
 \arguments{
   \item{X}{random variable}

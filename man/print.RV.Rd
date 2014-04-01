@@ -3,7 +3,7 @@
 \title{Print a random variable of class "RV"}
 \usage{
 \method{print}{RV}(x, odds = attr(x, "odds"), fractions = attr(x,
-  "fractions"), ...)
+  "fractions"), all.outcomes = FALSE, digits = 3, ...)
 }
 \arguments{
   \item{x}{A random variable}
@@ -13,8 +13,14 @@
   \item{fractions}{If TRUE, print probs as fractions
   instead of decimals}
 
+  \item{all.outcomes}{If TRUE, print all outcomes rather
+  than the first ten}
+
+  \item{digits}{Number of digits to print for
+  probabilities}
+
   \item{...}{Additional arguments to be passed to the
-  "print" function}
+  "format" function}
 }
 \description{
 Print a random variable of class "RV"

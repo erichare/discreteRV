@@ -1,18 +1,18 @@
-exploreOutcomes <- function(outcomes, probs, tol = 1e-10) {
+exploreOutcomes <- function(outcomes, probs) {
     final.outcomes <- NULL
     
     if (!is.finite(outcomes[1]) & !is.finite(outcomes[2])) {
         curr <- 0
         out <- NULL
         
-        while (probs(curr) > tol) {
+        while (probs(curr) > 0) {
             out <- c(out, curr)
             curr <- curr + 1
         }
         
         curr <- -1
         
-        while (probs(curr) > tol) {
+        while (probs(curr) > 0) {
             out <- c(out, curr)
             curr <- curr - 1
         }
@@ -22,7 +22,7 @@ exploreOutcomes <- function(outcomes, probs, tol = 1e-10) {
         curr <- outcomes[1]
         out <- NULL
         
-        while (probs(curr) > tol) {
+        while (probs(curr) > 0) {
             out <- c(out, curr)
             curr <- curr + 1
         }
@@ -32,7 +32,7 @@ exploreOutcomes <- function(outcomes, probs, tol = 1e-10) {
         curr <- outcomes[2]
         out <- NULL
         
-        while (probs(curr) > tol) {
+        while (probs(curr) > 0) {
             out <- c(out, curr)
             curr <- curr - 1
         }
@@ -52,9 +52,8 @@ exploreOutcomes <- function(outcomes, probs, tol = 1e-10) {
 #' @param outcomes vector of possible outcomes
 #' @param probs vector of probabilities or function defining probabilities
 #' @param odds vector of odds
-#' @param fractions If TRUE, return the probabilities as fractions
+#' @param fractions If TRUE, return the probabilities as fractions when printing
 #' @param range If TRUE, outcomes specify a range of values in the form c(lower, upper)
-#' @param tol Any value below this level will be treated as zero probability
 #' @return random variable as RV object.
 #' @export
 #' @examples
@@ -68,25 +67,26 @@ exploreOutcomes <- function(outcomes, probs, tol = 1e-10) {
 #' X.biased.coin <- make.RV(c(2,-1), odds = c(1,2))
 #' 
 #' # Make a fair die
-#' X.fair.die <- make.RV(1:6, rep(1/6, 6), fractions = TRUE)
+#' X.fair.die <- make.RV(1:6, 1/6)
 #' 
 #' # Make a loaded die, specifying odds 1:1:1:1:2:4 rather than probabilities:
 #' X.loaded.die <- make.RV(1:6, odds = c(1,1,1,1,2,4))
 #' 
 #' # Make a Poisson random variable
 #' pois.func <- function(x, lambda = 5) { lambda^x * exp(-lambda) / factorial(x) }
-#' X.pois <- make.RV(c(0, Inf), pois.func, range = TRUE)
-make.RV <- function(outcomes, probs = NULL, odds = NULL, fractions = FALSE, range = FALSE, tol = 1e-10) {
+#' X.pois <- make.RV(c(0, Inf), pois.func)
+make.RV <- function(outcomes, probs = NULL, odds = NULL, fractions = (class(probs) != "function"), range = any(is.infinite(outcomes))) {
     
-    if (range) outcomes <- exploreOutcomes(outcomes, probs, tol)
-    if (class(probs) == "function") probs <- probs(outcomes)
+    test <- fractions # TODO: Fix
+    if (range) outcomes <- suppressWarnings(exploreOutcomes(outcomes, probs))
+    if (class(probs) == "function") probs <- suppressWarnings(probs(outcomes))
     
     pr <- probs
     if (is.null(pr)) pr <- odds
     
     probsSum <- sum(pr)
     
-    if (probsSum > 1 + tol & is.null(odds)) stop("Probabilities sum to over 1")
+    if (probsSum > 1 & is.null(odds)) stop("Probabilities sum to over 1")
     if (any(pr < 0)) stop("Probabilities cannot be negative")
     
     isOdds <- !is.null(odds)
@@ -101,7 +101,6 @@ make.RV <- function(outcomes, probs = NULL, odds = NULL, fractions = FALSE, rang
     probs <- pr / sum(pr)
     names(probs) <- outcomes
     
-    ## Force a certain precision
     class(outcomes) <- "RV"
     
     attr(outcomes, "probs") <- probs
@@ -262,7 +261,7 @@ probs <- function(X) {
 #' d <- make.RV(c("A","B","C"), odds = c(3,5,11))
 #' d2 <- mult(d,d)
 #' probs(d2)
-mult <- function(X, Y, sep=",", fractions=FALSE) {
+mult <- function(X, Y, sep=",", fractions = (attr(X, "fractions") & attr(Y, "fractions"))) {
     S <- X
     tmp <- tapply(outer(probs(S), probs(Y), FUN="*"),
                   outer(S, Y, FUN="paste", sep=sep), paste, sep=sep)
@@ -289,7 +288,7 @@ mult <- function(X, Y, sep=",", fractions=FALSE) {
 #' d <- make.RV(c("A","B","C"), odds = c(3,5,11))
 #' d2 <- multN(d)
 #' probs(d2)
-multN <- function(X, n=2, sep=",", fractions=FALSE) {
+multN <- function(X, n=2, sep=",", fractions=attr(X, "fractions")) {
     S <- X;  i <- 2
     while(i<=n) {
         tmp <- tapply(outer(probs(S), probs(X), FUN="*"),
@@ -314,7 +313,7 @@ multN <- function(X, n=2, sep=",", fractions=FALSE) {
 #' @param fractions If TRUE, return the probabilities as fractions
 #' 
 #' @export
-as.RV <- function(px, fractions = FALSE) {
+as.RV <- function(px, fractions = TRUE) {
     X <- as.numeric(names(px))
     
     class(X) <- "RV"
@@ -467,30 +466,24 @@ SofIID <- function(X, n=2, progress=TRUE, fractions=attr(X, "fractions")) {
 #' @method plot RV
 #' @param x A random variable
 #' @param ... Additional arguments to be passed to the "plot" function
+#' @param tol Only display outcomes with probabilities above tol
 #' @param pch Either an integer specifying a symbol or a single character to be used as the default in plotting points.
 #' @param cex A numerical value giving the amount by which plotting text and symbols should be magnified relative to the default.
 #' @param lwd The line width, a positive number, defaulting to 2.
 #' @param col A specification for the default plotting color
-#' @param stretch.x A numeric by which to extend the x axis limits
-#' @param stretch.y A numeric by which to extend the y axis limits
 #' @param xlab Label for the X axis
 #' @param ylab Label for the Y axis
-#' @param xlim Lower and upper limit for the x axis
-#' @param ylim Lower and upper limit for the y axis
 #' @export
 #' @examples
 #' fair.die <- make.RV(1:6, rep(1/6,6))
 #' plot(fair.die)
-plot.RV <- function(x, ..., pch=16, cex=1.2, lwd=2, col="black",
-                    stretch.x=1.2, stretch.y=1.2,
+plot.RV <- function(x, ..., tol=1e-10, pch=16, cex=1.2, lwd=2, col="black",
                     xlab="Possible Values",
-                    ylab="Probabilities",
-                    xlim=mean(range(x)) + (range(x)-mean(range(x)))*stretch.x,
-                    ylim=c(0, max(probs(x))*stretch.y)) {
+                    ylab="Probabilities") {
     ## args <- list(...);  print(args)
-    xx <- as.numeric(x)
-    px <- probs(x)
-    plot(xx, px, type="h", lwd=lwd, col=col, xlab=xlab, ylab=ylab, xlim=xlim, ylim=ylim, ...)
+    xx <- x[probs(x) > tol]
+    px <- probs(x)[probs(x) > tol]
+    plot(xx, px, type="h", lwd=lwd, col=col, xlab=xlab, ylab=ylab, ...)
     abline(h=0, col="gray")
     points(xx, px, pch=pch, cex=cex, col=col)
 }
@@ -502,16 +495,18 @@ plot.RV <- function(x, ..., pch=16, cex=1.2, lwd=2, col="black",
 #' @param x A random variable
 #' @param odds If TRUE, print as odds instead of probs
 #' @param fractions If TRUE, print probs as fractions instead of decimals
-#' @param ... Additional arguments to be passed to the "print" function
+#' @param all.outcomes If TRUE, print all outcomes rather than the first ten
+#' @param digits Number of digits to print for probabilities
+#' @param ... Additional arguments to be passed to the "format" function
 #' @export
 #' @examples
 #' fair.die <- make.RV(1:6, rep(1/6,6))
 #' print(fair.die)
-print.RV <- function(x, odds = attr(x, "odds"), fractions = attr(x, "fractions"), ...) {
+print.RV <- function(x, odds = attr(x, "odds"), fractions = attr(x, "fractions"), all.outcomes = FALSE, digits = 3, ...) {
     attributes(x)$class <- NULL
-    cat(paste("random variable with", length(x), "outcomes\n\n"))
         
     vec <- attr(x, "probs")
+    if (!fractions) vec <- round(vec, digits = digits)
     
     if (odds) vec <- vec / min(vec[vec > 0])
     if (fractions) {require(MASS); vec <- fractions(vec)}
@@ -519,20 +514,19 @@ print.RV <- function(x, odds = attr(x, "odds"), fractions = attr(x, "fractions")
     
     if (odds) type <- "Odds" else type <- "Probs"
     if (fractions & !odds) vec <- as.character(vec)
-    if (odds) vec <- paste(round(vec, digits = 4), round(sum(as.numeric(vec)) - as.numeric(vec), digits = 4), sep = ":")
+    if (odds) vec <- paste(round(vec, digits = digits), round(sum(as.numeric(vec)) - as.numeric(vec), digits = digits), sep = ":")
     
     df <- eval(parse(text = paste("data.frame(Outcomes = as.character(x), ", type, " = vec)", sep = "")))
+    names(df)[2] <- paste(type, paste(rep(" ", nchar("Outcomes") - nchar(type) - 1), collapse = ""))
     
-    if (nrow(df) > 10) {
-        print(df, row.names = FALSE, ...)
-    } else {
-        vec <- as.character(df[,type])
-        names(vec) <- df[,"Outcomes"]
-        
-        print(vec, quote = FALSE, ...)
-    }
+    old.df <- df
     
-    if (attr(x, "range")) cat(paste("\nOutcomes not listed are assumed to occur with zero probability\n"))
+    cat(paste("Random variable with", length(x), "outcomes\n\n"))
+    
+    if (nrow(df) > 12 & !all.outcomes) df <- df[1:12,]
+    write.table(format(t(df), justify = "right", ...), col.names = FALSE, quote = FALSE)
+
+    if (nrow(old.df) > 12) cat("\nDisplaying first 12 outcomes\n")
 }
 
 #' Normal quantile plot for RVs to answer the question how close to normal it is
@@ -570,7 +564,7 @@ qqnorm.RV <- function(y, ..., pch=16, cex=.5, add=FALSE, xlab="Normal Quantiles"
 #' @param sep parameter specifying the separator between dimensions, defaults to ","
 #' @export
 #' @examples
-#' X <- make.RV(1:6, odds = 1:6)
+#' X <- make.RV(1:6, 1/6)
 #' X3 <- multN(X, 3)
 #' margins(X3)
 margins <- function(X, sep=",") {

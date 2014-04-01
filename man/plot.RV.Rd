@@ -2,16 +2,17 @@
 \alias{plot.RV}
 \title{Plot a random variable of class "RV"}
 \usage{
-\method{plot}{RV}(x, ..., pch = 16, cex = 1.2, lwd = 2, col = "black",
-  stretch.x = 1.2, stretch.y = 1.2, xlab = "Possible Values",
-  ylab = "Probabilities", xlim = mean(range(x)) + (range(x) -
-  mean(range(x))) * stretch.x, ylim = c(0, max(probs(x)) * stretch.y))
+\method{plot}{RV}(x, ..., tol = 1e-10, pch = 16, cex = 1.2, lwd = 2,
+  col = "black", xlab = "Possible Values", ylab = "Probabilities")
 }
 \arguments{
   \item{x}{A random variable}
 
   \item{...}{Additional arguments to be passed to the
   "plot" function}
+
+  \item{tol}{Only display outcomes with probabilities above
+  tol}
 
   \item{pch}{Either an integer specifying a symbol or a
   single character to be used as the default in plotting
@@ -27,19 +28,9 @@
   \item{col}{A specification for the default plotting
   color}
 
-  \item{stretch.x}{A numeric by which to extend the x axis
-  limits}
-
-  \item{stretch.y}{A numeric by which to extend the y axis
-  limits}
-
   \item{xlab}{Label for the X axis}
 
   \item{ylab}{Label for the Y axis}
-
-  \item{xlim}{Lower and upper limit for the x axis}
-
-  \item{ylim}{Lower and upper limit for the y axis}
 }
 \description{
 Plot a random variable of class "RV"

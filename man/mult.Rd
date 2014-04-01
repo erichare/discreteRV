@@ -2,7 +2,8 @@
 \alias{mult}
 \title{Joint probability mass function of random variables X and Y}
 \usage{
-mult(X, Y, sep = ",", fractions = FALSE)
+mult(X, Y, sep = ",", fractions = (attr(X, "fractions") & attr(Y,
+  "fractions")))
 }
 \arguments{
   \item{X}{random variable}
