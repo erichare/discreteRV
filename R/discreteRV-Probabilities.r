@@ -131,7 +131,7 @@ unopset <- function(X, Xchar, cond, x) {
     X.notrv <- X
     class(X.notrv) <- NULL
     
-    result <- eval(parse(text = paste("X.notrv", cond, x)))
+    result <- eval(parse(text = paste("X.notrv", cond, "c(", paste(x, collapse = ","), ")")))
     class(result) <- "RVresult"
     
     attr(result, "outcomes") <- as.vector(X)
@@ -164,8 +164,21 @@ binopset <- function(X, Xchar, cond, Y) {
 ">=.RV" <- function(X, x) { return(unopset(X, deparse(substitute(X)), ">=", x)) }
 #' @export
 ">.RV" <- function(X, x) { return(unopset(X, deparse(substitute(X)), ">", x)) }
+
+
+#' Generic method for in operator function
+#' 
+#' @name %in%
+#' @param e1 First vector
+#' @param e2 Second vector
+#' @return A logical vector indicating which elements of e1 are in e2
 #' @export
-"%in%.RV" <- function(X, x) { return(unopset(X, deparse(substitute(X)), "%in%", x)) }
+"%in%" <- function(e1, e2) { UseMethod("%in%") } 
+
+#' @export
+"%in%.default" <- function(e1, e2) { base::`%in%`(e1, e2) }
+#' @export
+"%in%.RV" <- function(e1, e2) { return(unopset(e1, deparse(substitute(e1)), "%in%", e2)) }
 
 #' Compute the logical OR of two events
 #' 

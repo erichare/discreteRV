@@ -1,0 +1,18 @@
+\name{\%in\%}
+\alias{\%in\%}
+\title{Generic method for in operator function}
+\usage{
+e1 \%in\% e2
+}
+\arguments{
+  \item{e1}{First vector}
+
+  \item{e2}{Second vector}
+}
+\value{
+A logical vector indicating which elements of e1 are in e2
+}
+\description{
+Generic method for in operator function
+}
+
