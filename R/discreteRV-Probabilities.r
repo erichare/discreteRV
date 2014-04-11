@@ -164,6 +164,7 @@ binopset <- function(X, Xchar, cond, Y) {
 ">=.RV" <- function(X, x) { return(unopset(X, deparse(substitute(X)), ">=", x)) }
 #' @export
 ">.RV" <- function(X, x) { return(unopset(X, deparse(substitute(X)), ">", x)) }
+#' @export
 "%in%.RV" <- function(X, x) { return(unopset(X, deparse(substitute(X)), "%in%", x)) }
 
 #' Compute the logical OR of two events
