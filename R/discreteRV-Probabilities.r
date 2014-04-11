@@ -112,6 +112,8 @@ make.RV <- function(outcomes, probs = NULL, odds = NULL, fractions = (class(prob
 }
 
 unopset <- function(X, Xchar, cond, x) {
+    if (is.character(x)) x <- paste("\"", x, "\"", sep = "")
+    
     X.notrv <- X
     class(X.notrv) <- NULL
     
