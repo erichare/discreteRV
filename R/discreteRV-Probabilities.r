@@ -109,22 +109,6 @@ make.RV <- function(outcomes, probs = NULL, odds = NULL, fractions = (class(prob
     attr(outcomes, "range") <- range
 
     return(outcomes)
-} 
-
-conditional <- function(XY, sep = ",") {    
-    cond.vec <- eval(parse(text = paste("margins(", substitute(XY), ")$'2'", sep = "")))
-    
-    marginal.dist <- margins(XY)$'2'[cond.vec]
-        
-    distns <- lapply(1:length(marginal.dist), function(y) {
-        sub <- XY[grep(paste(",", marginal.dist[y], sep = ""), XY)]
-        pr <- sapply(names(sub), function(pstr) eval(parse(text=pstr)))
-        probs.sub <- pr / sum(pr)
-        
-        make.RV(sub, probs.sub, fractions = TRUE)
-    })
-    
-    return(distns)
 }
 
 unopset <- function(X, Xchar, cond, x) {
@@ -242,6 +226,26 @@ binopset <- function(X, Xchar, cond, Y) {
     names(vec) <- attr(x, "outcomes")
     
     return(print.default(vec, ...))
+}
+
+#' Outcomes of random variable X 
+#'
+#' Obtain the list of outcomes from a random variable
+#'
+#' @param X random variable
+#' @return vector of outcomes of X
+#' @export
+#' @examples
+#' X.Bern <- make.RV(c(1,0), c(.5,.5))
+#' outcomes(X.Bern)
+#' 
+#' X.fair.die <- make.RV(1:6, rep(1/6,6))
+#' outcomes(X.fair.die)
+#' 
+#' X.loaded.die <- make.RV(1:6, odds = c(1,1,1,1,2,4))
+#' outcomes(X.loaded.die)
+outcomes <- function(X) {
+    return(as.vector(X))
 }
 
 #' Probability mass function of random variable X 
