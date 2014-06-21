@@ -54,6 +54,7 @@ exploreOutcomes <- function(outcomes, probs) {
 #' @param odds vector of odds
 #' @param fractions If TRUE, return the probabilities as fractions when printing
 #' @param range If TRUE, outcomes specify a range of values in the form c(lower, upper)
+#' @param verifyprobs If TRUE, verify that the probs sum to one
 #' @return random variable as RV object.
 #' @export
 #' @examples
@@ -75,7 +76,7 @@ exploreOutcomes <- function(outcomes, probs) {
 #' # Make a Poisson random variable
 #' pois.func <- function(x, lambda = 5) { lambda^x * exp(-lambda) / factorial(x) }
 #' X.pois <- make.RV(c(0, Inf), pois.func)
-make.RV <- function(outcomes, probs = NULL, odds = NULL, fractions = (class(probs) != "function"), range = any(is.infinite(outcomes))) {
+make.RV <- function(outcomes, probs = NULL, odds = NULL, fractions = (class(probs) != "function"), range = any(is.infinite(outcomes)), verifyprobs = TRUE) {
     
     test <- fractions # TODO: Fix
     if (range) outcomes <- suppressWarnings(exploreOutcomes(outcomes, probs))
@@ -86,7 +87,7 @@ make.RV <- function(outcomes, probs = NULL, odds = NULL, fractions = (class(prob
     
     probsSum <- sum(pr)
     
-    if (probsSum > 1 + 1e-08 & is.null(odds)) stop("Probabilities sum to over 1")
+    if (probsSum > 1 + 1e-08 & is.null(odds) & verifyprobs) stop("Probabilities sum to over 1")
     if (any(pr < 0)) stop("Probabilities cannot be negative")
     
     isOdds <- !is.null(odds)
