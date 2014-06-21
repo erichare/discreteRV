@@ -99,7 +99,7 @@ make.RV <- function(outcomes, probs = NULL, odds = NULL, fractions = (class(prob
     }
     
     ## Convert to probs
-    probs <- pr / sum(pr)
+    if (verifyprobs) probs <- pr / sum(pr)
     names(probs) <- outcomes
     
     class(outcomes) <- "RV"
