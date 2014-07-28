@@ -1,18 +1,18 @@
 exploreOutcomes <- function(outcomes, probs) {
     final.outcomes <- NULL
     
-    if (!is.finite(outcomes[1]) & !is.finite(outcomes[2])) {
+    if (!is.finite(outcomes[1]) && !is.finite(outcomes[2])) {
         curr <- 0
         out <- NULL
         
-        while (probs(curr) > 0) {
+        while (probs(curr) > .Machine$double.eps^0.5) {
             out <- c(out, curr)
             curr <- curr + 1
         }
         
         curr <- -1
         
-        while (probs(curr) > 0) {
+        while (probs(curr) > .Machine$double.eps^0.5) {
             out <- c(out, curr)
             curr <- curr - 1
         }
@@ -22,7 +22,7 @@ exploreOutcomes <- function(outcomes, probs) {
         curr <- outcomes[1]
         out <- NULL
         
-        while (probs(curr) > 0) {
+        while (probs(curr) > .Machine$double.eps^0.5) {
             out <- c(out, curr)
             curr <- curr + 1
         }
@@ -32,7 +32,7 @@ exploreOutcomes <- function(outcomes, probs) {
         curr <- outcomes[2]
         out <- NULL
         
-        while (probs(curr) > 0) {
+        while (probs(curr) > .Machine$double.eps^0.5) {
             out <- c(out, curr)
             curr <- curr - 1
         }
