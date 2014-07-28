@@ -87,7 +87,7 @@ make.RV <- function(outcomes, probs = NULL, odds = NULL, fractions = (class(prob
     
     probsSum <- sum(pr)
     
-    if (probsSum > 1 + 1e-08 & is.null(odds) & verifyprobs) stop("Probabilities sum to over 1")
+    if ((probsSum > (1 + .Machine$double.eps)) && is.null(odds) & verifyprobs) stop("Probabilities sum to over 1")
     if (any(pr < 0)) stop("Probabilities cannot be negative")
     
     isOdds <- !is.null(odds)
