@@ -79,6 +79,8 @@ exploreOutcomes <- function(outcomes, probs) {
 make.RV <- function(outcomes, probs = NULL, odds = NULL, fractions = (class(probs) != "function"), range = any(is.infinite(outcomes)), verifyprobs = TRUE) {
     
     test <- fractions # TODO: Fix
+    old.out <- outcomes
+    
     if (range) outcomes <- suppressWarnings(exploreOutcomes(outcomes, probs))
     if (class(probs) == "function") probs <- suppressWarnings(probs(outcomes))
     
@@ -108,6 +110,7 @@ make.RV <- function(outcomes, probs = NULL, odds = NULL, fractions = (class(prob
     attr(outcomes, "odds") <- isOdds
     attr(outcomes, "fractions") <- fractions
     attr(outcomes, "range") <- range
+    attr(outcomes, "outcomes") <- old.out
 
     return(outcomes)
 }
@@ -543,7 +546,11 @@ print.RV <- function(x, odds = attr(x, "odds"), fractions = attr(x, "fractions")
     
     old.df <- df
     
-    cat(paste("Random variable with", length(x), "outcomes\n\n"))
+    if (attr(x, "range")) {
+        cat(paste("Random variable with outcomes from", attr(x, "outcomes")[1], "to", attr(x, "outcomes")[2], "\n\n"))
+    } else {
+        cat(paste("Random variable with", length(x), "outcomes\n\n"))
+    }
     
     if (nrow(df) > 12 & !all.outcomes) df <- df[1:12,]
     write.table(format(t(df), justify = "right", ...), col.names = FALSE, quote = FALSE)
