@@ -544,6 +544,10 @@ print.RV <- function(x, odds = attr(x, "odds"), fractions = attr(x, "fractions")
     df <- eval(parse(text = paste("data.frame(Outcomes = as.character(x), ", type, " = vec)", sep = "")))
     names(df)[2] <- paste(type, paste(rep(" ", nchar("Outcomes") - nchar(type) - 1), collapse = ""))
     
+    df$test <- type.convert(as.character(df$Outcomes), as.is = TRUE)
+    if (is.numeric(df$test)) df <- df[with(df, order(test)), ]
+    df$test <- NULL
+    
     old.df <- df
     
     if (attr(x, "range")) {
