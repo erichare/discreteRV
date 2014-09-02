@@ -116,6 +116,7 @@ make.RV <- function(outcomes, probs = NULL, odds = NULL, fractions = (class(prob
 }
 
 unopset <- function(X, Xchar, cond, x) {
+    if (class(x) == "RV") stop("Operations involving two random variables not supported")
     if (is.character(x)) x <- paste("\"", x, "\"", sep = "")
     
     X.notrv <- X
@@ -132,6 +133,8 @@ unopset <- function(X, Xchar, cond, x) {
 }
 
 binopset <- function(X, Xchar, cond, Y) {
+    if (attr(X, "rv") != attr(Y, "rv")) stop("Operations involving two random variables not supported")
+    
     result <- eval(parse(text = paste("as.logical(X)", cond, "as.logical(Y)")))
     class(result) <- "RVresult"
     
