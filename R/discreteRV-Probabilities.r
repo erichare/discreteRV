@@ -596,6 +596,7 @@ qqnorm.RV <- function(y, ..., pch=16, cex=.5, add=FALSE, xlab="Normal Quantiles"
 #'
 #' Extracts the marginal probability mass functions from a joint distribution.
 #' @author Heike Hofmann \email{hofmann@@iastate.edu}
+#' @importFrom plyr alply
 #' @param X a random variable
 #' @param sep parameter specifying the separator between dimensions, defaults to ","
 #' @export
@@ -606,7 +607,6 @@ qqnorm.RV <- function(y, ..., pch=16, cex=.5, add=FALSE, xlab="Normal Quantiles"
 margins <- function(X, sep=",") {
     dframe <- sapply(strsplit(as.character(X), split=sep, fixed=TRUE), function(x) as.matrix(x))
     
-    require(plyr)
     res <- alply(dframe, .margins=1, function(x) {
         dtab <- xtabs(probs(X)~x)
         make.RV(names(dtab), as.numeric(dtab))
