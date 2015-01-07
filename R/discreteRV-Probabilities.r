@@ -518,6 +518,8 @@ plot.RV <- function(x, ..., tol=1e-10, pch=16, cex=1.2, lwd=2, col="black",
 
 #' Print a random variable of class "RV"
 #' 
+#' @importFrom MASS fractions
+#' 
 #' @method print RV
 #' @author Eric Hare \email{erichare@@iastate.edu}
 #' @param x A random variable
@@ -537,7 +539,7 @@ print.RV <- function(x, odds = attr(x, "odds"), fractions = attr(x, "fractions")
     if (!fractions) vec <- round(vec, digits = digits)
     
     if (odds) vec <- vec / min(vec[vec > 0])
-    if (fractions) {require(MASS); vec <- fractions(vec)}
+    if (fractions) {vec <- fractions(vec)}
     names(vec) <- x
     
     if (odds) type <- "Odds" else type <- "Probs"
