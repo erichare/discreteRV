@@ -7,20 +7,22 @@
 \title{Make a random variable consisting of possible outcome values and their probabilities or odds}
 \usage{
 make.RV(outcomes, probs = NULL, odds = NULL, fractions = (class(probs) !=
-  "function"), range = any(is.infinite(outcomes)), verifyprobs = TRUE)
+  "function"), range = any(is.infinite(outcomes)), verifyprobs = TRUE, ...)
 }
 \arguments{
-\item{outcomes}{vector of possible outcomes}
+\item{outcomes}{Vector of possible outcomes}
 
-\item{probs}{vector of probabilities or function defining probabilities}
+\item{probs}{Vector of probabilities or function defining probabilities}
 
-\item{odds}{vector of odds}
+\item{odds}{Vector of odds}
 
 \item{fractions}{If TRUE, return the probabilities as fractions when printing}
 
 \item{range}{If TRUE, outcomes specify a range of values in the form c(lower, upper)}
 
 \item{verifyprobs}{If TRUE, verify that the probs sum to one}
+
+\item{...}{Additional parameters passed to the function defining outcome probabilities}
 }
 \value{
 random variable as RV object.
@@ -45,7 +47,7 @@ X.fair.die <- make.RV(1:6, 1/6)
 X.loaded.die <- make.RV(1:6, odds = c(1,1,1,1,2,4))
 
 # Make a Poisson random variable
-pois.func <- function(x, lambda = 5) { lambda^x * exp(-lambda) / factorial(x) }
-X.pois <- make.RV(c(0, Inf), pois.func)
+pois.func <- function(x, lambda) { lambda^x * exp(-lambda) / factorial(x) }
+X.pois <- make.RV(c(0, Inf), pois.func, lambda = 5)
 }
 

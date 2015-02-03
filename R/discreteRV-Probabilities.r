@@ -1,18 +1,18 @@
-exploreOutcomes <- function(outcomes, probs) {
+exploreOutcomes <- function(outcomes, probs, ...) {
     final.outcomes <- NULL
     
     if (!is.finite(outcomes[1]) && !is.finite(outcomes[2])) {
         curr <- 0
         out <- NULL
         
-        while (probs(curr) > .Machine$double.eps^0.5) {
+        while (probs(curr, ...) > .Machine$double.eps^0.5) {
             out <- c(out, curr)
             curr <- curr + 1
         }
         
         curr <- -1
         
-        while (probs(curr) > .Machine$double.eps^0.5) {
+        while (probs(curr, ...) > .Machine$double.eps^0.5) {
             out <- c(out, curr)
             curr <- curr - 1
         }
@@ -22,7 +22,7 @@ exploreOutcomes <- function(outcomes, probs) {
         curr <- outcomes[1]
         out <- NULL
         
-        while (probs(curr) > .Machine$double.eps^0.5) {
+        while (probs(curr, ...) > .Machine$double.eps^0.5) {
             out <- c(out, curr)
             curr <- curr + 1
         }
@@ -32,7 +32,7 @@ exploreOutcomes <- function(outcomes, probs) {
         curr <- outcomes[2]
         out <- NULL
         
-        while (probs(curr) > .Machine$double.eps^0.5) {
+        while (probs(curr, ...) > .Machine$double.eps^0.5) {
             out <- c(out, curr)
             curr <- curr - 1
         }
@@ -49,12 +49,13 @@ exploreOutcomes <- function(outcomes, probs) {
 #' 
 #' @name make.RV
 #' @docType package
-#' @param outcomes vector of possible outcomes
-#' @param probs vector of probabilities or function defining probabilities
-#' @param odds vector of odds
+#' @param outcomes Vector of possible outcomes
+#' @param probs Vector of probabilities or function defining probabilities
+#' @param odds Vector of odds
 #' @param fractions If TRUE, return the probabilities as fractions when printing
 #' @param range If TRUE, outcomes specify a range of values in the form c(lower, upper)
 #' @param verifyprobs If TRUE, verify that the probs sum to one
+#' @param ... Additional parameters passed to the function defining outcome probabilities
 #' @return random variable as RV object.
 #' @export
 #' @examples
@@ -74,15 +75,15 @@ exploreOutcomes <- function(outcomes, probs) {
 #' X.loaded.die <- make.RV(1:6, odds = c(1,1,1,1,2,4))
 #' 
 #' # Make a Poisson random variable
-#' pois.func <- function(x, lambda = 5) { lambda^x * exp(-lambda) / factorial(x) }
-#' X.pois <- make.RV(c(0, Inf), pois.func)
-make.RV <- function(outcomes, probs = NULL, odds = NULL, fractions = (class(probs) != "function"), range = any(is.infinite(outcomes)), verifyprobs = TRUE) {
+#' pois.func <- function(x, lambda) { lambda^x * exp(-lambda) / factorial(x) }
+#' X.pois <- make.RV(c(0, Inf), pois.func, lambda = 5)
+make.RV <- function(outcomes, probs = NULL, odds = NULL, fractions = (class(probs) != "function"), range = any(is.infinite(outcomes)), verifyprobs = TRUE, ...) {
     
     test <- fractions # TODO: Fix
     old.out <- outcomes
     
-    if (range) outcomes <- suppressWarnings(exploreOutcomes(outcomes, probs))
-    if (class(probs) == "function") probs <- suppressWarnings(probs(outcomes))
+    if (range) outcomes <- suppressWarnings(exploreOutcomes(outcomes, probs, ...))
+    if (class(probs) == "function") probs <- suppressWarnings(probs(outcomes, ...))
     
     pr <- probs
     if (is.null(pr)) pr <- odds
