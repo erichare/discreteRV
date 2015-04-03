@@ -1,8 +1,8 @@
 Package: discreteRV
 Maintainer: Eric Hare <erichare@iastate.edu>
 Author: Andreas Buja
-Version: 1.1.4
-Date: 2015-02-02
+Version: 1.2
+Date: 2015-04-03
 License: GPL-3
 Title: Functions to Create and Manipulate Discrete Random Variables
 Description: discreteRV implements a set of functions that allow computations

@@ -19,8 +19,8 @@ An RVcond object representing the conditional probability
 Compute the conditional probability of two events
 }
 \examples{
-X.fair.die <- make.RV(1:6, rep(1/6, 6))
-X.fair.coin <- make.RV(1:2, rep(1/2, 2))
+X.fair.die <- RV(1:6, rep(1/6, 6))
+X.fair.coin <- RV(1:2, rep(1/2, 2))
 
 P(X.fair.die == 4 | X.fair.die > 3)
 P(X.fair.die == 5 | X.fair.die < 5)

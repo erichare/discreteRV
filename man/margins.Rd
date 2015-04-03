@@ -15,8 +15,8 @@ margins(X, sep = ",")
 Extracts the marginal probability mass functions from a joint distribution.
 }
 \examples{
-X <- make.RV(1:6, 1/6)
-X3 <- multN(X, 3)
+X <- RV(1:6, 1/6)
+X3 <- iid(X, 3)
 margins(X3)
 }
 \author{

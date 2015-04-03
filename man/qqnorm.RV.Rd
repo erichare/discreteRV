@@ -29,7 +29,7 @@
 Normal quantile plot for RVs to answer the question how close to normal it is
 }
 \examples{
-fair.die <- make.RV(1:6, rep(1/6,6))
+fair.die <- RV(1:6, rep(1/6,6))
 qqnorm(fair.die)
 }
 

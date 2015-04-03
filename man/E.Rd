@@ -13,10 +13,10 @@ E(X)
 Expected value of a random variable
 }
 \examples{
-X.Bern <- make.RV(c(1,0), c(.5,.5))
+X.Bern <- RV(c(1,0), c(.5,.5))
 E(X.Bern)
 
-X.fair.die <- make.RV(1:6, rep(1/6,6))
+X.fair.die <- RV(1:6, rep(1/6,6))
 E(X.fair.die)
 }
 

@@ -47,7 +47,7 @@ exploreOutcomes <- function(outcomes, probs, ...) {
 
 #' Make a random variable consisting of possible outcome values and their probabilities or odds
 #' 
-#' @name make.RV
+#' @name RV
 #' @docType package
 #' @param outcomes Vector of possible outcomes
 #' @param probs Vector of probabilities or function defining probabilities
@@ -60,24 +60,24 @@ exploreOutcomes <- function(outcomes, probs, ...) {
 #' @export
 #' @examples
 #' # Make a 50:50 Bernoulli random variable:
-#' X.Bern <- make.RV(c(1,0), c(.5,.5))   
+#' X.Bern <- RV(c(1,0), c(.5,.5))   
 #'   
 #' # Make a fair coin flip game with payoffs +$1 and -$1:
-#' X.fair.coin <- make.RV(c(1,-1), c(.5,.5))
+#' X.fair.coin <- RV(c(1,-1), c(.5,.5))
 #' 
 #' # Make a biased coin flip game with odds 1:2 and with fair payoffs +$2 and -$1
-#' X.biased.coin <- make.RV(c(2,-1), odds = c(1,2))
+#' X.biased.coin <- RV(c(2,-1), odds = c(1,2))
 #' 
 #' # Make a fair die
-#' X.fair.die <- make.RV(1:6, 1/6)
+#' X.fair.die <- RV(1:6, 1/6)
 #' 
 #' # Make a loaded die, specifying odds 1:1:1:1:2:4 rather than probabilities:
-#' X.loaded.die <- make.RV(1:6, odds = c(1,1,1,1,2,4))
+#' X.loaded.die <- RV(1:6, odds = c(1,1,1,1,2,4))
 #' 
 #' # Make a Poisson random variable
 #' pois.func <- function(x, lambda) { lambda^x * exp(-lambda) / factorial(x) }
-#' X.pois <- make.RV(c(0, Inf), pois.func, lambda = 5)
-make.RV <- function(outcomes, probs = NULL, odds = NULL, fractions = (class(probs) != "function"), range = any(is.infinite(outcomes)), verifyprobs = TRUE, ...) {
+#' X.pois <- RV(c(0, Inf), pois.func, lambda = 5)
+RV <- function(outcomes, probs = NULL, odds = NULL, fractions = (class(probs) != "function"), range = any(is.infinite(outcomes)), verifyprobs = TRUE, ...) {
     
     test <- fractions # TODO: Fix
     old.out <- outcomes
@@ -182,7 +182,7 @@ binopset <- function(X, Xchar, cond, Y) {
 #' @return An RVresult object which is two events ORed together
 #' @export
 #' @examples
-#' X.fair.die <- make.RV(1:6, rep(1/6,6))
+#' X.fair.die <- RV(1:6, rep(1/6,6))
 #' P((X.fair.die == 4) %OR% (X.fair.die == 3))
 "%OR%" <- function(X, Y) { return(binopset(X, deparse(substitute(X)), "|", Y)) }
 
@@ -194,7 +194,7 @@ binopset <- function(X, Xchar, cond, Y) {
 #' @return An RVresult object which is two events ANDed together
 #' @export
 #' @examples
-#' X.fair.die <- make.RV(1:6, rep(1/6,6))
+#' X.fair.die <- RV(1:6, rep(1/6,6))
 #' P((X.fair.die == 4) %AND% (X.fair.die == 3))
 "%AND%" <- function(X, Y) { return(binopset(X, deparse(substitute(X)), "&", Y)) }
 
@@ -207,8 +207,8 @@ binopset <- function(X, Xchar, cond, Y) {
 #' @return An RVcond object representing the conditional probability
 #' @export
 #' @examples
-#' X.fair.die <- make.RV(1:6, rep(1/6, 6))
-#' X.fair.coin <- make.RV(1:2, rep(1/2, 2))
+#' X.fair.die <- RV(1:6, rep(1/6, 6))
+#' X.fair.coin <- RV(1:2, rep(1/2, 2))
 #' 
 #' P(X.fair.die == 4 | X.fair.die > 3)
 #' P(X.fair.die == 5 | X.fair.die < 5)
@@ -246,13 +246,13 @@ binopset <- function(X, Xchar, cond, Y) {
 #' @return vector of outcomes of X
 #' @export
 #' @examples
-#' X.Bern <- make.RV(c(1,0), c(.5,.5))
+#' X.Bern <- RV(c(1,0), c(.5,.5))
 #' outcomes(X.Bern)
 #' 
-#' X.fair.die <- make.RV(1:6, rep(1/6,6))
+#' X.fair.die <- RV(1:6, rep(1/6,6))
 #' outcomes(X.fair.die)
 #' 
-#' X.loaded.die <- make.RV(1:6, odds = c(1,1,1,1,2,4))
+#' X.loaded.die <- RV(1:6, odds = c(1,1,1,1,2,4))
 #' outcomes(X.loaded.die)
 outcomes <- function(X) {
     return(as.vector(X))
@@ -266,13 +266,13 @@ outcomes <- function(X) {
 #' @return named vector of probablities for each element of the random variable
 #' @export
 #' @examples
-#' X.Bern <- make.RV(c(1,0), c(.5,.5))
+#' X.Bern <- RV(c(1,0), c(.5,.5))
 #' probs(X.Bern)
 #' 
-#' X.fair.die <- make.RV(1:6, rep(1/6,6))
+#' X.fair.die <- RV(1:6, rep(1/6,6))
 #' probs(X.fair.die)
 #' 
-#' X.loaded.die <- make.RV(1:6, odds = c(1,1,1,1,2,4))
+#' X.loaded.die <- RV(1:6, odds = c(1,1,1,1,2,4))
 #' probs(X.loaded.die)
 probs <- function(X) { 
     return(attr(X, "probs"))
@@ -287,10 +287,10 @@ probs <- function(X) {
 #' @param fractions If TRUE, return the probabilities as fractions
 #' @export
 #' @examples
-#' d <- make.RV(c("A","B","C"), odds = c(3,5,11))
-#' d2 <- mult(d,d)
+#' d <- RV(c("A","B","C"), odds = c(3,5,11))
+#' d2 <- joint(d,d)
 #' probs(d2)
-mult <- function(X, Y, sep=",", fractions = (attr(X, "fractions") & attr(Y, "fractions"))) {
+joint <- function(X, Y, sep=",", fractions = (attr(X, "fractions") & attr(Y, "fractions"))) {
     S <- X
     tmp <- tapply(outer(probs(S), probs(Y), FUN="*"),
                   outer(S, Y, FUN="paste", sep=sep), paste, sep=sep)
@@ -314,10 +314,10 @@ mult <- function(X, Y, sep=",", fractions = (attr(X, "fractions") & attr(Y, "fra
 #' @param fractions If TRUE, return the probabilities as fractions
 #' @export
 #' @examples
-#' d <- make.RV(c("A","B","C"), odds = c(3,5,11))
-#' d2 <- multN(d)
+#' d <- RV(c("A","B","C"), odds = c(3,5,11))
+#' d2 <- iid(d)
 #' probs(d2)
-multN <- function(X, n=2, sep=",", fractions=attr(X, "fractions")) {
+iid <- function(X, n=2, sep=",", fractions=attr(X, "fractions")) {
     S <- X;  i <- 2
     while(i<=n) {
         tmp <- tapply(outer(probs(S), probs(X), FUN="*"),
@@ -360,10 +360,10 @@ as.RV <- function(px, fractions = TRUE) {
 #' @param event A logical vector
 #' @export
 #' @examples
-#' X.fair.die <- make.RV(1:6, rep(1/6,6))
+#' X.fair.die <- RV(1:6, rep(1/6,6))
 #' P(X.fair.die>3)
 #' 
-#' X.loaded.die <- make.RV(1:6, odds = c(1,1,1,1,2,4))
+#' X.loaded.die <- RV(1:6, odds = c(1,1,1,1,2,4))
 #' P(X.loaded.die>3)
 #' P(X.loaded.die==6)
 P <- function(event) { UseMethod("P") } 
@@ -379,10 +379,10 @@ P.RVcond <- function(event) { return(event) }
 #' @param X random variable
 #' @export
 #' @examples
-#' X.Bern <- make.RV(c(1,0), c(.5,.5))
+#' X.Bern <- RV(c(1,0), c(.5,.5))
 #' E(X.Bern)
 #' 
-#' X.fair.die <- make.RV(1:6, rep(1/6,6))
+#' X.fair.die <- RV(1:6, rep(1/6,6))
 #' E(X.fair.die)
 E <- function(X) { sum(X*probs(X)) }
 
@@ -391,7 +391,7 @@ E <- function(X) { sum(X*probs(X)) }
 #' @param X random variable
 #' @export
 #' @examples
-#' X.Bern <- make.RV(c(1,0), c(.5,.5))
+#' X.Bern <- RV(c(1,0), c(.5,.5))
 #' E(X.Bern)
 V <- function(X) { E((X-E(X))^2) }
 
@@ -400,7 +400,7 @@ V <- function(X) { E((X-E(X))^2) }
 #' @param X random variable
 #' @export
 #' @examples
-#' X.Bern <- make.RV(c(1,0), c(.5,.5))
+#' X.Bern <- RV(c(1,0), c(.5,.5))
 #' E(X.Bern)
 SD <- function(X) { sqrt(V(X)) }
 
@@ -409,7 +409,7 @@ SD <- function(X) { sqrt(V(X)) }
 #' @param X random variable
 #' @export
 #' @examples
-#' X.Bern <- make.RV(c(1,0), c(.5,.5))
+#' X.Bern <- RV(c(1,0), c(.5,.5))
 #' SKEW(X.Bern)
 SKEW <- function(X) { E((X-E(X))^3)/SD(X)^3 }
 
@@ -418,7 +418,7 @@ SKEW <- function(X) { E((X-E(X))^3)/SD(X)^3 }
 #' @param X random variable
 #' @export
 #' @examples
-#' X.Bern <- make.RV(c(1,0), c(.5,.5))
+#' X.Bern <- RV(c(1,0), c(.5,.5))
 #' KURT(X.Bern)
 KURT <- function(X) { E((X-E(X))^4)/V(X)^2 }
 
@@ -428,8 +428,8 @@ KURT <- function(X) { E((X-E(X))^4)/V(X)^2 }
 #' @param fractions If TRUE, return the probabilities as fractions
 #' @export
 #' @examples
-#' X.Bern <- make.RV(c(1,0), c(.5,.5))
-#' X.fair.die <- make.RV(1:6, rep(1/6,6))
+#' X.Bern <- RV(c(1,0), c(.5,.5))
+#' X.fair.die <- RV(1:6, rep(1/6,6))
 #' 
 #' S5 <- SofI(X.Bern, X.Bern, X.Bern, X.Bern, X.Bern)  
 #' S.mix <- SofI(X.Bern, X.fair.die)  # Independent but not IID
@@ -462,7 +462,7 @@ SofI <- function(..., fractions=attr(list(...)[[1]], "fractions")) {
 #' @param progress If TRUE, display a progress bar
 #' @export
 #' @examples
-#' X.Bern <- make.RV(c(1,0), c(.5,.5))
+#' X.Bern <- RV(c(1,0), c(.5,.5))
 #' 
 #' S5 <- SofIID(X.Bern, 5)
 #' S128 <- SofIID(X.Bern, 128)
@@ -504,7 +504,7 @@ SofIID <- function(X, n=2, progress=TRUE, fractions=attr(X, "fractions")) {
 #' @param ylab Label for the Y axis
 #' @export
 #' @examples
-#' fair.die <- make.RV(1:6, rep(1/6,6))
+#' fair.die <- RV(1:6, rep(1/6,6))
 #' plot(fair.die)
 plot.RV <- function(x, ..., tol=1e-10, pch=16, cex=1.2, lwd=2, col="black",
                     xlab="Possible Values",
@@ -531,7 +531,7 @@ plot.RV <- function(x, ..., tol=1e-10, pch=16, cex=1.2, lwd=2, col="black",
 #' @param ... Additional arguments to be passed to the "format" function
 #' @export
 #' @examples
-#' fair.die <- make.RV(1:6, rep(1/6,6))
+#' fair.die <- RV(1:6, rep(1/6,6))
 #' print(fair.die)
 print.RV <- function(x, odds = attr(x, "odds"), fractions = attr(x, "fractions"), all.outcomes = FALSE, digits = 3, ...) {
     attributes(x)$class <- NULL
@@ -581,7 +581,7 @@ print.RV <- function(x, odds = attr(x, "odds"), fractions = attr(x, "fractions")
 #' @param tol tolerance for the zero probability case
 #' @export
 #' @examples
-#' fair.die <- make.RV(1:6, rep(1/6,6))
+#' fair.die <- RV(1:6, rep(1/6,6))
 #' qqnorm(fair.die)
 qqnorm.RV <- function(y, ..., pch=16, cex=.5, add=FALSE, xlab="Normal Quantiles", ylab="Random Variable Quantiles", tol = 1e-10) {
     ind <- which(probs(y) > tol)
@@ -604,15 +604,15 @@ qqnorm.RV <- function(y, ..., pch=16, cex=.5, add=FALSE, xlab="Normal Quantiles"
 #' @param sep parameter specifying the separator between dimensions, defaults to ","
 #' @export
 #' @examples
-#' X <- make.RV(1:6, 1/6)
-#' X3 <- multN(X, 3)
+#' X <- RV(1:6, 1/6)
+#' X3 <- iid(X, 3)
 #' margins(X3)
 margins <- function(X, sep=",") {
     dframe <- sapply(strsplit(as.character(X), split=sep, fixed=TRUE), function(x) as.matrix(x))
     
     res <- alply(dframe, .margins=1, function(x) {
         dtab <- xtabs(probs(X)~x)
-        make.RV(names(dtab), as.numeric(dtab))
+        RV(names(dtab), as.numeric(dtab))
     })    
     res
 }

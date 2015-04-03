@@ -18,7 +18,7 @@ An RVresult object which is two events ANDed together
 Compute the logical AND of two events
 }
 \examples{
-X.fair.die <- make.RV(1:6, rep(1/6,6))
+X.fair.die <- RV(1:6, rep(1/6,6))
 P((X.fair.die == 4) \%AND\% (X.fair.die == 3))
 }
 

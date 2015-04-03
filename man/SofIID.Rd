@@ -19,7 +19,7 @@ SofIID(X, n = 2, progress = TRUE, fractions = attr(X, "fractions"))
 Sum of independent identically distributed random variables
 }
 \examples{
-X.Bern <- make.RV(c(1,0), c(.5,.5))
+X.Bern <- RV(c(1,0), c(.5,.5))
 
 S5 <- SofIID(X.Bern, 5)
 S128 <- SofIID(X.Bern, 128)

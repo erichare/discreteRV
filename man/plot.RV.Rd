@@ -30,7 +30,7 @@
 Plot a random variable of class "RV"
 }
 \examples{
-fair.die <- make.RV(1:6, rep(1/6,6))
+fair.die <- RV(1:6, rep(1/6,6))
 plot(fair.die)
 }
 

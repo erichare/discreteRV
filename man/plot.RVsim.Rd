@@ -15,7 +15,7 @@
 Plot a simulated random vector
 }
 \examples{
-X <- make.RV(c(100000,10000,0), c(0.00025,0.005,0.99475))
+X <- RV(c(100000,10000,0), c(0.00025,0.005,0.99475))
 X.sim <- rsim(200000, X)
 
 plot(X.sim)

@@ -4,10 +4,10 @@
 #' @param X A random variable
 #' @export
 #' @examples
-#' X.Bern <- make.RV(c(1,0), c(.5,.5))
+#' X.Bern <- RV(c(1,0), c(.5,.5))
 #' X.Bern.sim100 <- rsim(100, X.Bern)
 #' 
-#' X.loaded.die <- make.RV(1:6, odds = c(1,1,1,1,2,4))
+#' X.loaded.die <- RV(1:6, odds = c(1,1,1,1,2,4))
 #' X.loaded.die.sim100 <- rsim(100, X.loaded.die)
 #' 
 #' # The function 'rsim()' attaches the probabilities as names to the random draws.
@@ -22,10 +22,10 @@ rsim <- function(n, X) { tmp <- sample(X, size=n, replace=T, prob=probs(X))
 #' @param ... Simulation data produced with the 'rsim()' function
 #' @export
 #' @examples
-#' X.Bern <- make.RV(c(1,0), c(.5,.5))
+#' X.Bern <- RV(c(1,0), c(.5,.5))
 #' X.Bern.sim100 <- rsim(100, X.Bern)
 #' 
-#' X.loaded.die <- make.RV(1:6, odds = c(1,1,1,1,2,4))
+#' X.loaded.die <- RV(1:6, odds = c(1,1,1,1,2,4))
 #' X.loaded.die.sim100 <- rsim(100, X.loaded.die)
 #' props(X.Bern.sim100)
 #' props(X.loaded.die.sim100)
@@ -49,7 +49,7 @@ props <- function(...) { LIST <- list(...)
 #' @param X.sim A simulated data vector produced with the 'rsim()' function
 #' @export
 #' @examples
-#' X <- make.RV(c(100000,10000,0), c(0.00025,0.005,0.99475))
+#' X <- RV(c(100000,10000,0), c(0.00025,0.005,0.99475))
 #' X.sim <- rsim(200000, X)
 #' 
 #' Prop(X.sim>0)
@@ -62,7 +62,7 @@ Prop <- function(X.sim) { sum(X.sim)/length(X.sim) }
 #' @param X.sim A simulated data vector produced with the 'rsim()' function
 #' @export
 #' @examples
-#' X <- make.RV(c(100000,10000,0), c(0.00025,0.005,0.99475))
+#' X <- RV(c(100000,10000,0), c(0.00025,0.005,0.99475))
 #' X.sim <- rsim(200000, X)
 #' 
 #' skewSim(X.sim)
@@ -75,7 +75,7 @@ skewSim <- function(X.sim) { mean(scale(X.sim)^3) }
 #' @param ... Additional arguments to  be passed to the 'plot()' function
 #' @export
 #' @examples
-#' X <- make.RV(c(100000,10000,0), c(0.00025,0.005,0.99475))
+#' X <- RV(c(100000,10000,0), c(0.00025,0.005,0.99475))
 #' X.sim <- rsim(200000, X)
 #' 
 #' plot(X.sim)
