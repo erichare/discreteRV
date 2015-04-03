@@ -122,7 +122,7 @@ ugh <- function(X, Y, op) {
     if (is.null(jointdist)) jointdist <- X * Y
     
     if (class(Y) == "RV") {
-        result <- unlist(lapply(strsplit(jointdist, ","), function(hi){op(as.numeric(hi[1]), as.numeric(hi[2]))}))
+        result <- unlist(lapply(strsplit(jointdist, ","), function(hi){op(as.numeric(hi[attr(X, "num")]), as.numeric(hi[attr(Y, "num")]))}))
     } else {
         result <- unlist(lapply(strsplit(jointdist, ","), function(hi){op(hi[attr(X, "num")], Y)}))
     }
@@ -198,9 +198,11 @@ binopset <- function(X, Xchar, cond, Y) {
 #' @export
 "+.RV" <- function(X, Y) { return(SofI(X, Y)) }
 #' @export
-"*.RV" <- function(X, Y) { if (class(Y) == "RV") return(joint(X, Y)) else return(RV(outcomes(X) * Y, probs(X))) }
+"-.RV" <- function(X, Y) { return(SofI(X, RV(-as.numeric(outcomes(Y)), probs(Y)))) }
 #' @export
-"^.RV" <- function(X, Y) { return(RV(outcomes(X)^Y, probs(X))) }
+"*.RV" <- function(X, Y) { if (class(Y) == "RV") return(joint(X, Y)) else return(RV(as.numeric(outcomes(X)) * Y, probs(X))) }
+#' @export
+"^.RV" <- function(X, Y) { return(RV(as.numeric(outcomes(X))^Y, probs(X))) }
 
 #' Generic method for in operator function
 #' 
@@ -243,22 +245,16 @@ binopset <- function(X, Xchar, cond, Y) {
 #' P((X.fair.die == 4) %AND% (X.fair.die == 3))
 "%AND%" <- function(X, Y) { return(binopset(X, deparse(substitute(X)), "&", Y)) }
 
-#' Compute the conditional probability of two events
-#' 
-#' @name Conditional
-#' @aliases |.RVresult
-#' @param vec1 an RVresult object
-#' @param vec2 an RVresult object
-#' @return An RVcond object representing the conditional probability
 #' @export
-#' @examples
-#' X.fair.die <- RV(1:6, rep(1/6, 6))
-#' X.fair.coin <- RV(1:2, rep(1/2, 2))
-#' 
-#' P(X.fair.die == 4 | X.fair.die > 3)
-#' P(X.fair.die == 5 | X.fair.die < 5)
-#' P(X.fair.die == 4 | X.fair.coin == 1) # Independence
+"|" <- function(e1, e2) { UseMethod("|") } 
+
+#' @export
+"|.default" <- function(e1, e2) { base::`|`(e1, e2) }
+
+#' @export
 "|.RVresult" <- function(vec1, vec2) {
+    if (class(vec1) == "RV") return(discreteRV:::`|.RVresult`(vec1, vec2))
+        
     cond1 <- (attr(vec1, "rv") == attr(vec2, "rv"))
     cond2 <- (gsub("[(=<>) 1-9]", "", paste(as.character(attr(vec1, "rv")), collapse = "")) == gsub("[(=<>) 1-9]", "", paste(as.character(attr(vec2, "rv")), collapse = "")))
     cond3 <- P(vec2) == 0
@@ -268,6 +264,21 @@ binopset <- function(X, Xchar, cond, Y) {
     attr(result, "probs") <- attr(vec1, "probs")
     
     return(result)
+}
+
+#' @export
+"|.RV" <- function(X, cond) {    
+    jointdist <- attr(X, "joint")
+    vec <- jointdist[cond]
+    mynum <- attr(X, "num")
+    
+    mysplit <- strsplit(jointdist, ",")
+    myout <- as.numeric(unlist(lapply(mysplit, function(test){test[mynum]})))
+    
+    final.outcomes <- myout[cond]
+    final.probs <- as.numeric(probs(jointdist)[cond] / sum(probs(jointdist)[cond]))
+    
+    return(RV(final.outcomes, final.probs))
 }
 
 #' @export
@@ -485,7 +496,7 @@ SofI <- function(..., fractions=attr(list(...)[[1]], "fractions")) {
     while(length(LIST)>0) {
         X <- LIST[[1]]
         tmp <- tapply(outer(probs(S), probs(X), FUN="*"),
-                      outer(S,        X,        FUN="+"), sum)
+                      outer(as.numeric(outcomes(S)), as.numeric(outcomes(X)), FUN="+"), sum)
         S <- as.numeric(names(tmp))  
         attr(S, "probs") <- tmp
         LIST <- LIST[-1]
@@ -516,7 +527,7 @@ SofIID <- function(X, n=2, progress=TRUE, fractions=attr(X, "fractions")) {
     pb <- txtProgressBar(min = 1, max = n)
     while(i<=n) {
         tmp <- tapply(outer(probs(S), probs(X), FUN="*"),
-                      outer(S,        X,        FUN="+"), sum)
+                      outer(as.numeric(outcomes(S)), as.numeric(outcomes(X)), FUN="+"), sum)
         
         S <- as.numeric(names(tmp))  
         attr(S, "probs") <- tmp
