@@ -1,48 +1,15 @@
-exploreOutcomes <- function(outcomes, probs, ...) {
-    final.outcomes <- NULL
+exploreOutcomes <- function(outcomes, probs, name, ...) {
+        maxvalue <- if (is.character(name) && name == "poisson") 50 else 1000
+        minvalue <- if (is.character(name) == "poisson") -50 else -1000
     
-    if (!is.finite(outcomes[1]) && !is.finite(outcomes[2])) {
-        curr <- 0
-        out <- NULL
+        outcomes[outcomes == Inf] <- maxvalue
+        outcomes[outcomes == -Inf] <- minvalue
         
-        while (probs(curr, ...) > .Machine$double.eps^0.5) {
-            out <- c(out, curr)
-            curr <- curr + 1
-        }
+        myprobs <- probs(outcomes[1]:outcomes[2], ...)
+        myouts <- (outcomes[1]:outcomes[2])[!is.nan(myprobs)]
+        myprobs <- myprobs[!is.nan(myprobs)]
         
-        curr <- -1
-        
-        while (probs(curr, ...) > .Machine$double.eps^0.5) {
-            out <- c(out, curr)
-            curr <- curr - 1
-        }
-        
-        final.outcomes <- out
-    } else if (!is.finite(outcomes[2])) {
-        curr <- outcomes[1]
-        out <- NULL
-        
-        while (probs(curr, ...) > .Machine$double.eps^0.5) {
-            out <- c(out, curr)
-            curr <- curr + 1
-        }
-        
-        final.outcomes <- out
-    } else if (!is.finite(outcomes[1])) {
-        curr <- outcomes[2]
-        out <- NULL
-        
-        while (probs(curr, ...) > .Machine$double.eps^0.5) {
-            out <- c(out, curr)
-            curr <- curr - 1
-        }
-        
-        final.outcomes <- out
-    } else {
-        final.outcomes <- outcomes[1]:outcomes[2]
-    }
-    
-    return(final.outcomes)
+        return(myouts[myprobs > .Machine$double.eps^0.5])
 }
 
 #' Make a random variable consisting of possible outcome values and their probabilities or odds
@@ -79,11 +46,30 @@ exploreOutcomes <- function(outcomes, probs, ...) {
 #' pois.func <- function(x, lambda) { lambda^x * exp(-lambda) / factorial(x) }
 #' X.pois <- RV(c(0, Inf), pois.func, lambda = 5)
 RV <- function(outcomes, probs = NULL, odds = NULL, fractions = (class(probs) != "function"), range = any(is.infinite(outcomes)), verifyprobs = TRUE, id = rnorm(1), ...) {
+    ##
+    ## Special dists
+    ##
+    outtry <- outcomes
+    if (length(outcomes) == 1 && outcomes == "bernoulli") {
+        probs <- function(x, ...) { p <- ifelse(length(list(...)) == 0, .5, list(...)[[1]]); p^x * (1 - p)^(1 - x) }
+        outtry <- 0:1
+    } else if (length(outcomes) == 1 && outcomes == "poisson") {
+        probs <- function(x, ...) { lambda <- ifelse(length(list(...)) == 0, 5, list(...)[[1]]); lambda^x * exp(-lambda) / factorial(x) }
+        range <- TRUE
+        fractions <- FALSE
+        outtry <- c(0, Inf)
+    } else if (length(outcomes) == 1 && outcomes == "geometric") {
+        probs <- function(x, ...) { p <- ifelse(length(list(...)) == 0, .5, list(...)[[1]]); (1 - p)^(x - 1) * p }
+        range <- TRUE
+        fractions <- FALSE
+        outtry <- c(1, Inf)
+    }
     
     test <- fractions # TODO: Fix
-    old.out <- outcomes
+    old.out <- outtry
     
-    if (range) outcomes <- suppressWarnings(exploreOutcomes(outcomes, probs, ...))
+    if (range) outcomes <- suppressWarnings(exploreOutcomes(outtry, probs, outcomes, ...))     else outcomes <- outtry
+    
     if (class(probs) == "function") probs <- suppressWarnings(probs(outcomes, ...))
     
     pr <- probs
