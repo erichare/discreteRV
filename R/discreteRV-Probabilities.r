@@ -116,6 +116,26 @@ RV <- function(outcomes, probs = NULL, odds = NULL, fractions = (class(probs) !=
     return(outcomes)
 }
 
+ugh <- function(X, Y, op) {
+    op <- get(op)
+    jointdist <- attr(X, "joint")
+    if (is.null(jointdist)) jointdist <- X * Y
+    
+    if (class(Y) == "RV") {
+        result <- unlist(lapply(strsplit(jointdist, ","), function(hi){op(as.numeric(hi[1]), as.numeric(hi[2]))}))
+    } else {
+        result <- unlist(lapply(strsplit(jointdist, ","), function(hi){op(hi[attr(X, "num")], Y)}))
+    }
+    
+    class(result) <- "RVresult"
+    
+    attr(result, "outcomes") <- outcomes(jointdist)
+    attr(result, "rv") <- "joint"
+    attr(result, "probs") <- probs(jointdist)
+    
+    return(result)
+}
+
 unopset <- function(X, Xchar, cond, x) {
     if (class(x) == "RV") stop("Operations involving two random variables not supported")
     if (is.character(x)) x <- paste("\"", x, "\"", sep = "")
@@ -133,9 +153,7 @@ unopset <- function(X, Xchar, cond, x) {
     return(result)
 }
 
-binopset <- function(X, Xchar, cond, Y) {
-    if (attr(X, "rv") != attr(Y, "rv")) stop("Operations involving two random variables not supported")
-    
+binopset <- function(X, Xchar, cond, Y) {    
     result <- eval(parse(text = paste("as.logical(X)", cond, "as.logical(Y)")))
     class(result) <- "RVresult"
     
@@ -147,18 +165,42 @@ binopset <- function(X, Xchar, cond, Y) {
 }
 
 #' @export
-"<.RV" <- function(X, x) { return(unopset(X, deparse(substitute(X)), "<", x)) }
+"<.RV" <- function(X, x) { 
+    if (class(x) == "RV" || !is.null(attr(X, "joint"))) return(ugh(X, x, "<"))
+    else return(unopset(X, deparse(substitute(X)), "<", x)) 
+}
 #' @export
-"<=.RV" <- function(X, x) { return(unopset(X, deparse(substitute(X)), "<=", x)) }
+"<=.RV" <- function(X, x) { 
+    if (class(x) == "RV" || !is.null(attr(X, "joint"))) return(ugh(X, x, "<="))
+    else return(unopset(X, deparse(substitute(X)), "<=", x)) 
+}
 #' @export
-"==.RV" <- function(X, x) { return(unopset(X, deparse(substitute(X)), "==", x)) }
+"==.RV" <- function(X, x) { 
+    if (class(x) == "RV" || !is.null(attr(X, "joint"))) return(ugh(X, x, "=="))
+    else return(unopset(X, deparse(substitute(X)), "==", x)) 
+}
 #' @export
-"!=.RV" <- function(X, x) { return(unopset(X, deparse(substitute(X)), "!=", x)) }
+"!=.RV" <- function(X, x) { 
+    if (class(x) == "RV" || !is.null(attr(X, "joint"))) return(ugh(X, x, "!="))
+    else return(unopset(X, deparse(substitute(X)), "!=", x)) 
+}
 #' @export
-">=.RV" <- function(X, x) { return(unopset(X, deparse(substitute(X)), ">=", x)) }
+">=.RV" <- function(X, x) { 
+    if (class(x) == "RV" || !is.null(attr(X, "joint"))) return(ugh(X, x, ">="))
+    else return(unopset(X, deparse(substitute(X)), ">=", x)) 
+}
 #' @export
-">.RV" <- function(X, x) { return(unopset(X, deparse(substitute(X)), ">", x)) }
+">.RV" <- function(X, x) { 
+    if (class(x) == "RV" || !is.null(attr(X, "joint"))) return(ugh(X, x, ">"))
+    else return(unopset(X, deparse(substitute(X)), ">", x)) 
+}
 
+#' @export
+"+.RV" <- function(X, Y) { return(SofI(X, Y)) }
+#' @export
+"*.RV" <- function(X, Y) { if (class(Y) == "RV") return(joint(X, Y)) else return(RV(outcomes(X) * Y, probs(X))) }
+#' @export
+"^.RV" <- function(X, Y) { return(RV(outcomes(X)^Y, probs(X))) }
 
 #' Generic method for in operator function
 #' 
@@ -172,7 +214,10 @@ binopset <- function(X, Xchar, cond, Y) {
 #' @export
 "%in%.default" <- function(e1, e2) { base::`%in%`(e1, e2) }
 #' @export
-"%in%.RV" <- function(e1, e2) { return(unopset(e1, deparse(substitute(e1)), "%in%", e2)) }
+"%in%.RV" <- function(e1, e2) { 
+    if (!is.null(attr(e1, "joint"))) return(ugh(e1, e2, "%in%"))
+    else return(unopset(e1, deparse(substitute(e1)), "%in%", e2))
+}
 
 #' Compute the logical OR of two events
 #' 
@@ -595,7 +640,7 @@ qqnorm.RV <- function(y, ..., pch=16, cex=.5, add=FALSE, xlab="Normal Quantiles"
     }
 }
 
-#' Marginal distribution of a joint random variable
+#' Marginal distributions of a joint random variable
 #'
 #' Extracts the marginal probability mass functions from a joint distribution.
 #' @author Heike Hofmann \email{hofmann@@iastate.edu}
@@ -612,7 +657,28 @@ margins <- function(X, sep=",") {
     
     res <- alply(dframe, .margins=1, function(x) {
         dtab <- xtabs(probs(X)~x)
-        RV(names(dtab), as.numeric(dtab))
-    })    
-    res
+        my.rv <- RV(names(dtab), as.numeric(dtab))
+        attr(my.rv, "joint") <- X
+        my.rv
+    })   
+    
+    attributes(res) <- NULL
+    for (i in 1:length(res)) attr(res[[i]], "num") <- i
+    
+    return(res)
+}
+
+#' Marginal distribution of a joint random variable
+#'
+#' Extracts the marginal probability mass functions from a joint distribution.
+#' @author Eric Hare \email{erichare@@iastate.edu}
+#' @param X A random variable
+#' @param num Number indicating which marginal distribution to extract
+#' @export
+#' @examples
+#' X <- RV(1:6, 1/6)
+#' X3 <- iid(X, 3)
+#' margins(X3)
+marginal <- function(X, num) {
+    return(margins(X)[[num]])
 }
