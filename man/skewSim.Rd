@@ -14,7 +14,7 @@ Skew of the empirical distribution of simulated data
 }
 \examples{
 X <- RV(c(100000,10000,0), c(0.00025,0.005,0.99475))
-X.sim <- rsim(200000, X)
+X.sim <- rsim(X, 200000)
 
 skewSim(X.sim)
 }

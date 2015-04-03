@@ -55,6 +55,7 @@ exploreOutcomes <- function(outcomes, probs, ...) {
 #' @param fractions If TRUE, return the probabilities as fractions when printing
 #' @param range If TRUE, outcomes specify a range of values in the form c(lower, upper)
 #' @param verifyprobs If TRUE, verify that the probs sum to one
+#' @param id Set the id of the random variable
 #' @param ... Additional parameters passed to the function defining outcome probabilities
 #' @return random variable as RV object.
 #' @export
@@ -77,7 +78,7 @@ exploreOutcomes <- function(outcomes, probs, ...) {
 #' # Make a Poisson random variable
 #' pois.func <- function(x, lambda) { lambda^x * exp(-lambda) / factorial(x) }
 #' X.pois <- RV(c(0, Inf), pois.func, lambda = 5)
-RV <- function(outcomes, probs = NULL, odds = NULL, fractions = (class(probs) != "function"), range = any(is.infinite(outcomes)), verifyprobs = TRUE, ...) {
+RV <- function(outcomes, probs = NULL, odds = NULL, fractions = (class(probs) != "function"), range = any(is.infinite(outcomes)), verifyprobs = TRUE, id = rnorm(1), ...) {
     
     test <- fractions # TODO: Fix
     old.out <- outcomes
@@ -112,6 +113,7 @@ RV <- function(outcomes, probs = NULL, odds = NULL, fractions = (class(probs) !=
     attr(outcomes, "fractions") <- fractions
     attr(outcomes, "range") <- range
     attr(outcomes, "outcomes") <- old.out
+    attr(outcomes, "id") <- id
 
     return(outcomes)
 }
@@ -137,7 +139,6 @@ ugh <- function(X, Y, op) {
 }
 
 unopset <- function(X, Xchar, cond, x) {
-    if (class(x) == "RV") stop("Operations involving two random variables not supported")
     if (is.character(x)) x <- paste("\"", x, "\"", sep = "")
     
     X.notrv <- X
@@ -196,11 +197,41 @@ binopset <- function(X, Xchar, cond, Y) {
 }
 
 #' @export
-"+.RV" <- function(X, Y) { return(SofI(X, Y)) }
+"+.RV" <- function(X, Y) {
+    if (class(X) == "RV" && class(Y) == "RV" && attr(X, "id") != attr(Y, "id")) {
+        return(SofI(X, Y))
+    } else if (class(X) == "RV" && class(Y) != "RV") {
+        return(RV(as.numeric(outcomes(X)) + Y, probs(X), id = attr(X, "id")))
+    } else if (class(X) != "RV" && class(Y) == "RV") {
+        return(RV(as.numeric(outcomes(Y)) + X, probs(Y), id = attr(Y, "id")))
+    } else {
+        return(RV(as.numeric(outcomes(X)) + as.numeric(outcomes(Y)), probs(X), id = attr(X, "id")))
+    }
+}
 #' @export
-"-.RV" <- function(X, Y) { return(SofI(X, RV(-as.numeric(outcomes(Y)), probs(Y)))) }
+"-.RV" <- function(X, Y) {
+    if (class(X) == "RV" && class(Y) == "RV" && attr(X, "id") != attr(Y, "id")) {
+        return(SofI(X, RV(-as.numeric(outcomes(Y)), probs(Y), id = attr(Y, "id"))))
+    } else if (class(X) == "RV" && class(Y) != "RV") {
+        return(RV(as.numeric(outcomes(X)) - Y, probs(X), id = attr(X, "id")))
+    } else if (class(X) != "RV" && class(Y) == "RV") {
+        return(RV(-as.numeric(outcomes(Y)) + X, probs(Y), id = attr(Y, "id")))
+    } else {
+        return(RV(as.numeric(outcomes(X)) - as.numeric(outcomes(Y)), probs(X), id = attr(X, "id")))
+    }
+}
 #' @export
-"*.RV" <- function(X, Y) { if (class(Y) == "RV") return(joint(X, Y)) else return(RV(as.numeric(outcomes(X)) * Y, probs(X))) }
+"*.RV" <- function(X, Y) { 
+    if (class(X) == "RV" && class(Y) == "RV" && attr(X, "id") != attr(Y, "id")) {
+        return(joint(X, Y))
+    } else if (class(X) == "RV" && class(Y) != "RV") {
+        return(RV(as.numeric(outcomes(X)) * Y, probs(X), id = attr(X, "id")))
+    } else if (class(X) != "RV" && class(Y) == "RV") {
+        return(RV(as.numeric(outcomes(Y)) * X, probs(Y), id = attr(Y, "id")))
+    } else {
+        return(RV(as.numeric(outcomes(X)) * as.numeric(outcomes(Y)), probs(X), id = attr(X, "id")))
+    }
+}
 #' @export
 "^.RV" <- function(X, Y) { return(RV(as.numeric(outcomes(X))^Y, probs(X))) }
 
@@ -246,15 +277,20 @@ binopset <- function(X, Xchar, cond, Y) {
 "%AND%" <- function(X, Y) { return(binopset(X, deparse(substitute(X)), "&", Y)) }
 
 #' @export
-"|" <- function(e1, e2) { UseMethod("|") } 
-
-#' @export
-"|.default" <- function(e1, e2) { base::`|`(e1, e2) }
-
-#' @export
 "|.RVresult" <- function(vec1, vec2) {
-    if (class(vec1) == "RV") return(discreteRV:::`|.RVresult`(vec1, vec2))
+    if (class(vec1) == "RV") {
+        jointdist <- attr(vec1, "joint")
+        vec <- jointdist[vec2]
+        mynum <- attr(vec1, "num")
         
+        mysplit <- strsplit(jointdist, ",")
+        myout <- as.numeric(unlist(lapply(mysplit, function(test){test[mynum]})))
+        
+        final.outcomes <- myout[vec2]
+        final.probs <- as.numeric(probs(jointdist)[vec2] / sum(probs(jointdist)[vec2]))
+        
+        return(RV(final.outcomes, final.probs))
+    }
     cond1 <- (attr(vec1, "rv") == attr(vec2, "rv"))
     cond2 <- (gsub("[(=<>) 1-9]", "", paste(as.character(attr(vec1, "rv")), collapse = "")) == gsub("[(=<>) 1-9]", "", paste(as.character(attr(vec2, "rv")), collapse = "")))
     cond3 <- P(vec2) == 0
@@ -264,21 +300,6 @@ binopset <- function(X, Xchar, cond, Y) {
     attr(result, "probs") <- attr(vec1, "probs")
     
     return(result)
-}
-
-#' @export
-"|.RV" <- function(X, cond) {    
-    jointdist <- attr(X, "joint")
-    vec <- jointdist[cond]
-    mynum <- attr(X, "num")
-    
-    mysplit <- strsplit(jointdist, ",")
-    myout <- as.numeric(unlist(lapply(mysplit, function(test){test[mynum]})))
-    
-    final.outcomes <- myout[cond]
-    final.probs <- as.numeric(probs(jointdist)[cond] / sum(probs(jointdist)[cond]))
-    
-    return(RV(final.outcomes, final.probs))
 }
 
 #' @export
@@ -440,7 +461,16 @@ P.RVcond <- function(event) { return(event) }
 #' 
 #' X.fair.die <- RV(1:6, rep(1/6,6))
 #' E(X.fair.die)
-E <- function(X) { sum(X*probs(X)) }
+E <- function(X) { 
+    isjoint <- length(grep(",", X)) > 0
+    if (isjoint) {
+        val <- lapply(strsplit(outcomes(X), ","), function(test) {
+            prod(as.numeric(test)) * P(X == (paste(test, collapse = ",")))
+        })
+        return(sum(unlist(as.numeric(val))))
+    }
+    return(sum(X*probs(X)))
+}
 
 #' Variance of a random variable
 #' 

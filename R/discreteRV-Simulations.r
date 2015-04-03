@@ -5,16 +5,16 @@
 #' @export
 #' @examples
 #' X.Bern <- RV(c(1,0), c(.5,.5))
-#' X.Bern.sim100 <- rsim(100, X.Bern)
+#' X.Bern.sim100 <- rsim(X.Bern, 100)
 #' 
 #' X.loaded.die <- RV(1:6, odds = c(1,1,1,1,2,4))
-#' X.loaded.die.sim100 <- rsim(100, X.loaded.die)
+#' X.loaded.die.sim100 <- rsim(X.loaded.die, 100)
 #' 
 #' # The function 'rsim()' attaches the probabilities as names to the random draws.
 #' # To get the values only, use 'as.vector()':
 #' as.vector(X.Bern.sim100)
 #' as.vector(X.loaded.die.sim100)
-rsim <- function(n, X) { tmp <- sample(X, size=n, replace=T, prob=probs(X))
+rsim <- function(X, n) { tmp <- sample(X, size=n, replace=T, prob=probs(X))
                          attributes(tmp)$RV <- X;  class(tmp) <- "RVsim";  tmp } 
 
 #' Proportions of observed outcomes in one or more vectors of simulated trials
@@ -23,10 +23,10 @@ rsim <- function(n, X) { tmp <- sample(X, size=n, replace=T, prob=probs(X))
 #' @export
 #' @examples
 #' X.Bern <- RV(c(1,0), c(.5,.5))
-#' X.Bern.sim100 <- rsim(100, X.Bern)
+#' X.Bern.sim100 <- rsim(X.Bern, 100)
 #' 
 #' X.loaded.die <- RV(1:6, odds = c(1,1,1,1,2,4))
-#' X.loaded.die.sim100 <- rsim(100, X.loaded.die)
+#' X.loaded.die.sim100 <- rsim(X.loaded.die, 100)
 #' props(X.Bern.sim100)
 #' props(X.loaded.die.sim100)
 #' # Note: 'props()' is the analog of 'probs()', but
@@ -50,7 +50,7 @@ props <- function(...) { LIST <- list(...)
 #' @export
 #' @examples
 #' X <- RV(c(100000,10000,0), c(0.00025,0.005,0.99475))
-#' X.sim <- rsim(200000, X)
+#' X.sim <- rsim(X, 200000)
 #' 
 #' Prop(X.sim>0)
 #' Prop(X.sim==100000)
@@ -63,7 +63,7 @@ Prop <- function(X.sim) { sum(X.sim)/length(X.sim) }
 #' @export
 #' @examples
 #' X <- RV(c(100000,10000,0), c(0.00025,0.005,0.99475))
-#' X.sim <- rsim(200000, X)
+#' X.sim <- rsim(X, 200000)
 #' 
 #' skewSim(X.sim)
 skewSim <- function(X.sim) { mean(scale(X.sim)^3) }
@@ -76,10 +76,16 @@ skewSim <- function(X.sim) { mean(scale(X.sim)^3) }
 #' @export
 #' @examples
 #' X <- RV(c(100000,10000,0), c(0.00025,0.005,0.99475))
-#' X.sim <- rsim(200000, X)
+#' X.sim <- rsim(X, 200000)
 #' 
 #' plot(X.sim)
 plot.RVsim <- function(x, ...) {
     X <- as.RV(props(x))
     plot(X, ylab="Proportions", ...)
+}
+
+#' @export
+print.RVsim <- function(x, ...) {
+    cat("Simulated Vector: ", as.vector(x), "\n\n")
+    print(attr(x, "RV"))
 }

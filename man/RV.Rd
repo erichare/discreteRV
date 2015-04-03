@@ -7,7 +7,8 @@
 \title{Make a random variable consisting of possible outcome values and their probabilities or odds}
 \usage{
 RV(outcomes, probs = NULL, odds = NULL, fractions = (class(probs) !=
-  "function"), range = any(is.infinite(outcomes)), verifyprobs = TRUE, ...)
+  "function"), range = any(is.infinite(outcomes)), verifyprobs = TRUE,
+  id = rnorm(1), ...)
 }
 \arguments{
 \item{outcomes}{Vector of possible outcomes}
@@ -21,6 +22,8 @@ RV(outcomes, probs = NULL, odds = NULL, fractions = (class(probs) !=
 \item{range}{If TRUE, outcomes specify a range of values in the form c(lower, upper)}
 
 \item{verifyprobs}{If TRUE, verify that the probs sum to one}
+
+\item{id}{Set the id of the random variable}
 
 \item{...}{Additional parameters passed to the function defining outcome probabilities}
 }
