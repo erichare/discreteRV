@@ -234,7 +234,7 @@ binopset <- function(X, Xchar, cond, Y) {
 #' @export
 "+.RV" <- function(X, Y) {
     if (class(X) == "RV" && class(Y) == "RV" && attr(X, "id") != attr(Y, "id")) {
-        return(SofI(X, Y))
+        return(SofI(X, Y, fractions = (attr(X, "fractions") && attr(Y, "fractions"))))
     } else if (class(X) == "RV" && class(Y) != "RV") {
         return(RV(as.numeric(outcomes(X)) + Y, probs(X), fractions = attr(X, "fractions"), id = attr(X, "id")))
     } else if (class(X) != "RV" && class(Y) == "RV") {
@@ -246,7 +246,7 @@ binopset <- function(X, Xchar, cond, Y) {
 #' @export
 "-.RV" <- function(X, Y) {
     if (class(X) == "RV" && class(Y) == "RV" && attr(X, "id") != attr(Y, "id")) {
-        return(SofI(X, RV(-as.numeric(outcomes(Y)), probs(Y), fractions = attr(Y, "fractions"), id = attr(Y, "id"))))
+        return(SofI(X, Y * -1, fractions = (attr(X, "fractions") && attr(Y, "fractions"))))
     } else if (class(X) == "RV" && class(Y) != "RV") {
         return(RV(as.numeric(outcomes(X)) - Y, probs(X), fractions = attr(X, "fractions"), id = attr(X, "id")))
     } else if (class(X) != "RV" && class(Y) == "RV") {
@@ -408,7 +408,7 @@ joint <- function(X, Y, sep=",", fractions = (attr(X, "fractions") & attr(Y, "fr
                   outer(S, Y, FUN="paste", sep=sep), paste, sep=sep)
     S <- names(tmp)
 
-    return(RV(outcomes = as.character(S), probs = as.numeric(tmp)))
+    return(RV(outcomes = as.character(S), probs = as.numeric(tmp), fractions = fractions))
 }
 
 #' Probability mass function of  X^n
@@ -433,7 +433,7 @@ iid <- function(X, n=2, sep=",", fractions=attr(X, "fractions")) {
         i <- i+1
     }
 
-    return(RV(outcomes = as.character(S), probs = attr(S, "probs")))
+    return(RV(outcomes = as.character(S), probs = attr(S, "probs"), fractions = fractions))
 }
 
 #' Turn a probability vector with possible outcome values in the 'names()' attribute
@@ -556,7 +556,7 @@ SofI <- function(..., fractions=attr(list(...)[[1]], "fractions")) {
         LIST <- LIST[-1]
     }
     
-    return(RV(as.numeric(S), attr(S, "probs")))
+    return(RV(as.numeric(S), attr(S, "probs"), fractions = fractions))
 }
 
 #' Sum of independent identically distributed random variables
@@ -586,7 +586,7 @@ SofIID <- function(X, n=2, progress=TRUE, fractions=attr(X, "fractions")) {
     };
     close(pb)
     
-    return(RV(as.numeric(S), attr(S, "probs"), id = attr(X, "id"), fractions = (attr(X, "fractions") && n <= 4)))
+    return(RV(as.numeric(S), attr(S, "probs"), id = attr(X, "id"), fractions = fractions))
 }
 
 #' Plot a random variable of class "RV"
@@ -609,6 +609,8 @@ plot.RV <- function(x, ..., tol=1e-10, pch=16, cex=1.2, lwd=2, col="black",
                     xlab="Possible Values",
                     ylab="Probabilities") {
     ## args <- list(...);  print(args)
+    if (!is.numeric(outcomes(x))) stop("Plot method only defined with numeric outcomes.")
+    
     xx <- x[probs(x) > tol]
     px <- probs(x)[probs(x) > tol]
     plot(xx, px, type="h", lwd=lwd, col=col, xlab=xlab, ylab=ylab, ...)
@@ -683,6 +685,8 @@ print.RV <- function(x, odds = attr(x, "odds"), fractions = attr(x, "fractions")
 #' fair.die <- RV(1:6, rep(1/6,6))
 #' qqnorm(fair.die)
 qqnorm.RV <- function(y, ..., pch=16, cex=.5, add=FALSE, xlab="Normal Quantiles", ylab="Random Variable Quantiles", tol = 1e-10) {
+    if (!is.numeric(outcomes(y))) stop("qqnorm method only defined with numeric outcomes.")
+    
     ind <- which(probs(y) > tol)
     outcomes <- sort(y[ind])
     pc <- cumsum(probs(y))[ind]
@@ -711,7 +715,7 @@ margins <- function(X, sep=",") {
     
     res <- alply(dframe, .margins=1, function(x) {
         dtab <- xtabs(probs(X)~x)
-        my.rv <- RV(names(dtab), as.numeric(dtab))
+        my.rv <- RV(type.convert(names(dtab)), as.numeric(dtab))
         attr(my.rv, "joint") <- X
         my.rv
     })   
