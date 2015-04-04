@@ -15,9 +15,9 @@ marginal(X, num)
 Extracts the marginal probability mass functions from a joint distribution.
 }
 \examples{
-X <- RV(1:6, 1/6)
-X3 <- iid(X, 3)
-margins(X3)
+AandB <- jointRV(outcomes = list(1:3, 0:2), probs = 1:9 / sum(1:9))
+marginal(AandB, 1)
+marginal(AandB, 2)
 }
 \author{
 Eric Hare \email{erichare@iastate.edu}

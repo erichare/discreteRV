@@ -25,10 +25,16 @@ exploreOutcomes <- function(outcomes, probs, name, ...) {
 #' @param id Set the id of the random variable
 #' @param ... Additional parameters passed to the function defining outcome probabilities
 #' @return random variable as RV object.
+#' @importFrom plyr ddply
+#' @importFrom plyr .
+#' @importFrom plyr summarise
 #' @export
 #' @examples
 #' # Make a 50:50 Bernoulli random variable:
 #' X.Bern <- RV(c(1,0), c(.5,.5))   
+#' 
+#' # An equivalent method
+#' X.Bern <- RV("bernoulli")
 #'   
 #' # Make a fair coin flip game with payoffs +$1 and -$1:
 #' X.fair.coin <- RV(c(1,-1), c(.5,.5))
@@ -45,6 +51,9 @@ exploreOutcomes <- function(outcomes, probs, name, ...) {
 #' # Make a Poisson random variable
 #' pois.func <- function(x, lambda) { lambda^x * exp(-lambda) / factorial(x) }
 #' X.pois <- RV(c(0, Inf), pois.func, lambda = 5)
+#' 
+#' # An equivalent method
+#' X.pois <- RV("poisson")
 RV <- function(outcomes, probs = NULL, odds = NULL, fractions = (class(probs) != "function"), range = any(is.infinite(outcomes)), verifyprobs = TRUE, id = rnorm(1), ...) {
     ##
     ## Special dists
@@ -92,6 +101,30 @@ RV <- function(outcomes, probs = NULL, odds = NULL, fractions = (class(probs) !=
     if (verifyprobs) probs <- pr / sum(pr)
     names(probs) <- outcomes
     
+    ## Remove zero prob events
+    ind <- (probs > .Machine$double.eps^0.5)
+    outcomes <- outcomes[ind]
+    probs <- probs[ind]
+    
+    if (any(duplicated(outcomes))) {
+        out <- NULL
+        my.df <- data.frame(out = as.vector(outcomes), pr = as.numeric(probs))
+        my.sum <- ddply(my.df, .(out), summarise, pr = sum(pr))
+        outcomes <- type.convert(as.character(my.sum$out))
+        probs <- as.numeric(my.sum$pr)
+        names(probs) <- outcomes
+    }
+    
+    if (length(grep(",", outcomes)) > 0) {
+        ord1 <- as.numeric(unlist(lapply(strsplit(outcomes, ","), '[[', 1)))
+        ord2 <- as.numeric(unlist(lapply(strsplit(outcomes, ","), '[[', 2)))
+        ord3 <- ord1 * length(unique(ord2)) + ord2
+        
+        outcomes <- outcomes[order(ord3)]
+        probs <- probs[order(ord3)]
+        names(probs) <- outcomes
+    }
+    
     class(outcomes) <- "RV"
     
     attr(outcomes, "probs") <- probs
@@ -102,6 +135,22 @@ RV <- function(outcomes, probs = NULL, odds = NULL, fractions = (class(probs) !=
     attr(outcomes, "id") <- id
 
     return(outcomes)
+}
+
+#' Make a joint random variable consisting 
+#' 
+#' @name jointRV
+#' @param outcomes The possible outcomes of the joint random variable, as a list
+#' @param probs The probabilities of each event, in the order (x1, y1, x1, y2, ..., x2, y1, x2, y2, ..., xn, yn)
+#' @param ... Further arguments to be passed to the RV function
+#' @return An RV object
+#' @export
+jointRV <- function(outcomes, probs = NULL, ...) {
+    if (!is.list(outcomes)) stop("outcomes must be presented as a list of outcomes for each variable")
+    
+    myouts <- apply(expand.grid(outcomes)[with(expand.grid(outcomes), order(Var1)),], 1, paste, collapse = ",")
+    
+    RV(myouts, probs, ...)
 }
 
 ugh <- function(X, Y, op) {
@@ -187,23 +236,23 @@ binopset <- function(X, Xchar, cond, Y) {
     if (class(X) == "RV" && class(Y) == "RV" && attr(X, "id") != attr(Y, "id")) {
         return(SofI(X, Y))
     } else if (class(X) == "RV" && class(Y) != "RV") {
-        return(RV(as.numeric(outcomes(X)) + Y, probs(X), id = attr(X, "id")))
+        return(RV(as.numeric(outcomes(X)) + Y, probs(X), fractions = attr(X, "fractions"), id = attr(X, "id")))
     } else if (class(X) != "RV" && class(Y) == "RV") {
-        return(RV(as.numeric(outcomes(Y)) + X, probs(Y), id = attr(Y, "id")))
+        return(RV(as.numeric(outcomes(Y)) + X, probs(Y), fractions = attr(Y, "fractions"), id = attr(Y, "id")))
     } else {
-        return(RV(as.numeric(outcomes(X)) + as.numeric(outcomes(Y)), probs(X), id = attr(X, "id")))
+        return(RV(as.numeric(outcomes(X)) + as.numeric(outcomes(Y)), probs(X), fractions = attr(X, "fractions"), id = attr(X, "id")))
     }
 }
 #' @export
 "-.RV" <- function(X, Y) {
     if (class(X) == "RV" && class(Y) == "RV" && attr(X, "id") != attr(Y, "id")) {
-        return(SofI(X, RV(-as.numeric(outcomes(Y)), probs(Y), id = attr(Y, "id"))))
+        return(SofI(X, RV(-as.numeric(outcomes(Y)), probs(Y), fractions = attr(Y, "fractions"), id = attr(Y, "id"))))
     } else if (class(X) == "RV" && class(Y) != "RV") {
-        return(RV(as.numeric(outcomes(X)) - Y, probs(X), id = attr(X, "id")))
+        return(RV(as.numeric(outcomes(X)) - Y, probs(X), fractions = attr(X, "fractions"), id = attr(X, "id")))
     } else if (class(X) != "RV" && class(Y) == "RV") {
-        return(RV(-as.numeric(outcomes(Y)) + X, probs(Y), id = attr(Y, "id")))
+        return(RV(-as.numeric(outcomes(Y)) + X, probs(Y), fractions = attr(Y, "fractions"), id = attr(Y, "id")))
     } else {
-        return(RV(as.numeric(outcomes(X)) - as.numeric(outcomes(Y)), probs(X), id = attr(X, "id")))
+        return(RV(as.numeric(outcomes(X)) - as.numeric(outcomes(Y)), probs(X), fractions = attr(X, "fractions"), id = attr(X, "id")))
     }
 }
 #' @export
@@ -211,15 +260,15 @@ binopset <- function(X, Xchar, cond, Y) {
     if (class(X) == "RV" && class(Y) == "RV" && attr(X, "id") != attr(Y, "id")) {
         return(joint(X, Y))
     } else if (class(X) == "RV" && class(Y) != "RV") {
-        return(RV(as.numeric(outcomes(X)) * Y, probs(X), id = attr(X, "id")))
+        return(RV(as.numeric(outcomes(X)) * Y, probs(X), fractions = attr(X, "fractions"), id = attr(X, "id")))
     } else if (class(X) != "RV" && class(Y) == "RV") {
-        return(RV(as.numeric(outcomes(Y)) * X, probs(Y), id = attr(Y, "id")))
+        return(RV(as.numeric(outcomes(Y)) * X, probs(Y), fractions = attr(Y, "fractions"), id = attr(Y, "id")))
     } else {
-        return(RV(as.numeric(outcomes(X)) * as.numeric(outcomes(Y)), probs(X), id = attr(X, "id")))
+        return(RV(as.numeric(outcomes(X)) * as.numeric(outcomes(Y)), probs(X), fractions = attr(X, "fractions"), id = attr(X, "id")))
     }
 }
 #' @export
-"^.RV" <- function(X, Y) { return(RV(as.numeric(outcomes(X))^Y, probs(X))) }
+"^.RV" <- function(X, Y) { return(RV(as.numeric(outcomes(X))^Y, probs(X), fractions = attr(X, "fractions"), id = attr(X, "id"))) }
 
 #' Generic method for in operator function
 #' 
@@ -358,14 +407,8 @@ joint <- function(X, Y, sep=",", fractions = (attr(X, "fractions") & attr(Y, "fr
     tmp <- tapply(outer(probs(S), probs(Y), FUN="*"),
                   outer(S, Y, FUN="paste", sep=sep), paste, sep=sep)
     S <- names(tmp)
-    class(S) <- "RV"
-    
-    attr(S, "probs") <- as.numeric(tmp)
-    attr(S, "fractions") <- fractions
-    attr(S, "odds") <- FALSE
-    attr(S, "range") <- attr(X, "range")
 
-    return(S)
+    return(RV(outcomes = as.character(S), probs = as.numeric(tmp)))
 }
 
 #' Probability mass function of  X^n
@@ -389,13 +432,8 @@ iid <- function(X, n=2, sep=",", fractions=attr(X, "fractions")) {
         attr(S, "probs") <- as.numeric(tmp)
         i <- i+1
     }
-    class(S) <- "RV"
-    
-    attr(S, "fractions") <- fractions
-    attr(S, "odds") <- FALSE
-    attr(S, "range") <- attr(X, "range")
 
-    return(S)
+    return(RV(outcomes = as.character(S), probs = attr(S, "probs")))
 }
 
 #' Turn a probability vector with possible outcome values in the 'names()' attribute
@@ -455,7 +493,7 @@ E <- function(X) {
         })
         return(sum(unlist(as.numeric(val))))
     }
-    return(sum(X*probs(X)))
+    return(sum(as.numeric(X)*probs(X)))
 }
 
 #' Variance of a random variable
@@ -517,13 +555,8 @@ SofI <- function(..., fractions=attr(list(...)[[1]], "fractions")) {
         attr(S, "probs") <- tmp
         LIST <- LIST[-1]
     }
-    class(S) <- "RV"
     
-    attr(S, "fractions") <- fractions
-    attr(S, "odds") <- FALSE
-    attr(S, "range") <- attr(list(...)[[1]], "range")
-    
-    return(S)
+    return(RV(as.numeric(S), attr(S, "probs")))
 }
 
 #' Sum of independent identically distributed random variables
@@ -553,13 +586,7 @@ SofIID <- function(X, n=2, progress=TRUE, fractions=attr(X, "fractions")) {
     };
     close(pb)
     
-    class(S) <- "RV"
-    
-    attr(S, "fractions") <- fractions
-    attr(S, "odds") <- FALSE
-    attr(S, "range") <- attr(X, "range")
-    
-    return(S)
+    return(RV(as.numeric(S), attr(S, "probs"), id = attr(X, "id"), fractions = (attr(X, "fractions") && n <= 4)))
 }
 
 #' Plot a random variable of class "RV"
@@ -703,9 +730,36 @@ margins <- function(X, sep=",") {
 #' @param num Number indicating which marginal distribution to extract
 #' @export
 #' @examples
-#' X <- RV(1:6, 1/6)
-#' X3 <- iid(X, 3)
-#' margins(X3)
+#' AandB <- jointRV(outcomes = list(1:3, 0:2), probs = 1:9 / sum(1:9))
+#' marginal(AandB, 1)
+#' marginal(AandB, 2)
 marginal <- function(X, num) {
     return(margins(X)[[num]])
+}
+
+#' Tests whether the random variables X and Y are independent
+#' @author Eric Hare \email{erichare@@iastate.edu}
+#' @param X A random variable
+#' @param Y A random variable
+#' @export
+#' @examples
+#' AandB <- jointRV(outcomes = list(1:3, 0:2), probs = 1:9 / sum(1:9))
+#' A <- marginal(AandB, 1)
+#' B <- marginal(AandB, 2)
+#' independent(A, B) # FALSE
+#' CandD <- jointRV(outcomes = list(1:3, 0:2))
+#' C <- marginal(CandD, 1)
+#' D <- marginal(CandD, 2)
+#' independent(C, D) # FALSE
+independent <- function(X, Y) {
+    firstjoint <- attr(X, "joint")
+    secondjoint <- attr(Y, "joint")
+    
+    if (is.null(firstjoint) | is.null(secondjoint)) return(TRUE)
+    
+    cond1 <- all(outcomes(firstjoint) == outcomes(secondjoint))
+    cond2 <- all(probs(firstjoint) == probs(secondjoint))
+    cond3 <- all(as.vector(outer(probs(X), probs(Y))) == as.numeric(probs(firstjoint)))
+    
+    return(cond1 && cond2 && cond3)
 }

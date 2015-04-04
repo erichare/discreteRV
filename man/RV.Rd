@@ -37,6 +37,9 @@ Make a random variable consisting of possible outcome values and their probabili
 # Make a 50:50 Bernoulli random variable:
 X.Bern <- RV(c(1,0), c(.5,.5))
 
+# An equivalent method
+X.Bern <- RV("bernoulli")
+
 # Make a fair coin flip game with payoffs +$1 and -$1:
 X.fair.coin <- RV(c(1,-1), c(.5,.5))
 
@@ -52,5 +55,8 @@ X.loaded.die <- RV(1:6, odds = c(1,1,1,1,2,4))
 # Make a Poisson random variable
 pois.func <- function(x, lambda) { lambda^x * exp(-lambda) / factorial(x) }
 X.pois <- RV(c(0, Inf), pois.func, lambda = 5)
+
+# An equivalent method
+X.pois <- RV("poisson")
 }
 

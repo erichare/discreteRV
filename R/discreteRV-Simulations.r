@@ -1,7 +1,7 @@
 #' Simulate n independent trials from a random variable X:
 #' 
-#' @param n The number of independent trials to simulate
 #' @param X A random variable
+#' @param n The number of independent trials to simulate
 #' @export
 #' @examples
 #' X.Bern <- RV(c(1,0), c(.5,.5))
