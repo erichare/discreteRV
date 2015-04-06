@@ -326,11 +326,7 @@ binopset <- function(X, Xchar, cond, Y) {
         
         return(RV(final.outcomes, final.probs))
     }
-    cond1 <- (attr(vec1, "rv") == attr(vec2, "rv"))
-    cond2 <- (gsub("[(=<>) 1-9]", "", paste(as.character(attr(vec1, "rv")), collapse = "")) == gsub("[(=<>) 1-9]", "", paste(as.character(attr(vec2, "rv")), collapse = "")))
-    cond3 <- P(vec2) == 0
-    
-    result <- if (cond1 | cond2 | cond3) P(vec1 %AND% vec2) / P(vec2) else P(vec1)
+    result <- P(vec1 %AND% vec2) / P(vec2)
     class(result) <- "RVcond"
     attr(result, "probs") <- attr(vec1, "probs")
     
