@@ -15,7 +15,7 @@ The latest stable release is available on CRAN, and can be loaded by calling ins
 
 3. Using the install_github function, install discreteRV with the following command:
 
-        install_github("discreteRV", "erichare")
+        install_github("erichare/discreteRV")
 
 4. Load the library with the following command:
 
