@@ -245,15 +245,7 @@ binopset <- function(X, Xchar, cond, Y) {
 }
 #' @export
 "-.RV" <- function(X, Y) {
-    if (class(X) == "RV" && class(Y) == "RV" && attr(X, "id") != attr(Y, "id")) {
-        return(SofI(X, Y * -1, fractions = (attr(X, "fractions") && attr(Y, "fractions"))))
-    } else if (class(X) == "RV" && class(Y) != "RV") {
-        return(RV(as.numeric(outcomes(X)) - Y, probs(X), fractions = attr(X, "fractions"), id = attr(X, "id")))
-    } else if (class(X) != "RV" && class(Y) == "RV") {
-        return(RV(-as.numeric(outcomes(Y)) + X, probs(Y), fractions = attr(Y, "fractions"), id = attr(Y, "id")))
-    } else {
-        return(RV(as.numeric(outcomes(X)) - as.numeric(outcomes(Y)), probs(X), fractions = attr(X, "fractions"), id = attr(X, "id")))
-    }
+    X + (-1 * Y)
 }
 #' @export
 "*.RV" <- function(X, Y) { 
