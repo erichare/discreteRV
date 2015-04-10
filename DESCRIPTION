@@ -7,10 +7,10 @@ Authors@R: c(
     person("Heike", "Hofmann", email = "hofmann@iastate.edu", role = "aut"))
 Description: Create, manipulate, transform, and simulate from discrete random
     variables. The syntax is modeled after that which is used in mathematical
-    statistics and probability courses, but with powerful support more advanced
-    probability calculations. This includes the creation of joint random
-    variables, and the derivation and manipulation of their conditional and
-    marginal distributions.
+    statistics and probability courses, but with powerful support for more 
+    advanced probability calculations. This includes the creation of joint
+    random variables, and the derivation and manipulation of their conditional
+    and marginal distributions.
 URL: https://github.com/erichare/discreteRV
 BugReports: https://github.com/erichare/discreteRV/issues
 Depends: R (>= 3.0.2)
