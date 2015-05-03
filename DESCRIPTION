@@ -14,11 +14,13 @@ Description: Create, manipulate, transform, and simulate from discrete random
 URL: https://github.com/erichare/discreteRV
 BugReports: https://github.com/erichare/discreteRV/issues
 Depends: R (>= 3.0.2)
-Imports:
+Imports: 
     plyr,
     MASS
-Suggests:
+Suggests: 
     testthat,
-    roxygen2
+    roxygen2,
+    knitr
 License: GPL-3
 LazyData: true
+VignetteBuilder: knitr
