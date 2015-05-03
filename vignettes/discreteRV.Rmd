@@ -18,7 +18,7 @@ discreteRV is an R package that allows simple creation and manipluation of discr
 
 ## Creating discrete random variables
 
-a discrete random variable is defined through the use of the \code{RV} function. \code{RV} accepts a vector of outcomes, a vector of probabilities, and returns an \code{RV} object. The code to create X, a random variable representing the roll of a fair die, is as follows:
+A discrete random variable is defined through the use of the \code{RV} function. \code{RV} accepts a vector of outcomes, a vector of probabilities, and returns an \code{RV} object. The code to create X, a random variable representing the roll of a fair die, is as follows:
 
 ```{r}
 (X <- RV(outcomes = 1:6, probs = 1/6))
