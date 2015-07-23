@@ -73,6 +73,7 @@ skewSim <- function(X.sim) { mean(scale(X.sim)^3) }
 #' @method plot RVsim
 #' @param x A simulated data vector produced with the 'rsim()' function
 #' @param ... Additional arguments to  be passed to the 'plot()' function
+#' @importFrom graphics plot
 #' @export
 #' @examples
 #' X <- RV(c(100000,10000,0), c(0.00025,0.005,0.99475))

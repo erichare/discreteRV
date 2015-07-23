@@ -25,6 +25,8 @@ exploreOutcomes <- function(outcomes, probs, name, ...) {
 #' @param id Set the id of the random variable
 #' @param ... Additional parameters passed to the function defining outcome probabilities
 #' @return random variable as RV object.
+#' @importFrom stats rnorm
+#' @importFrom utils type.convert
 #' @importFrom plyr ddply
 #' @importFrom plyr .
 #' @importFrom plyr summarise
@@ -554,6 +556,8 @@ SofI <- function(..., fractions=attr(list(...)[[1]], "fractions")) {
 #' @param fractions If TRUE, return the probabilities as fractions
 #' @param progress If TRUE, display a progress bar
 #' @export
+#' @importFrom utils txtProgressBar
+#' @importFrom utils setTxtProgressBar
 #' @examples
 #' X.Bern <- RV(c(1,0), c(.5,.5))
 #' 
@@ -590,6 +594,9 @@ SofIID <- function(X, n=2, progress=TRUE, fractions=attr(X, "fractions")) {
 #' @param xlab Label for the X axis
 #' @param ylab Label for the Y axis
 #' @export
+#' @importFrom graphics plot
+#' @importFrom graphics abline
+#' @importFrom graphics points
 #' @examples
 #' fair.die <- RV(1:6, rep(1/6,6))
 #' plot(fair.die)
@@ -618,6 +625,8 @@ plot.RV <- function(x, ..., tol=1e-10, pch=16, cex=1.2, lwd=2, col="black",
 #' @param all.outcomes If TRUE, print all outcomes rather than the first ten
 #' @param digits Number of digits to print for probabilities
 #' @param ... Additional arguments to be passed to the "format" function
+#' @importFrom utils type.convert
+#' @importFrom utils write.table
 #' @export
 #' @examples
 #' fair.die <- RV(1:6, rep(1/6,6))
@@ -668,6 +677,9 @@ print.RV <- function(x, odds = attr(x, "odds"), fractions = attr(x, "fractions")
 #' @param xlab Label for the X axis
 #' @param ylab Label for the Y axis
 #' @param tol tolerance for the zero probability case
+#' @importFrom graphics plot
+#' @importFrom graphics points
+#' @importFrom stats qnorm
 #' @export
 #' @examples
 #' fair.die <- RV(1:6, rep(1/6,6))
@@ -694,6 +706,8 @@ qqnorm.RV <- function(y, ..., pch=16, cex=.5, add=FALSE, xlab="Normal Quantiles"
 #' @param X a random variable
 #' @param sep parameter specifying the separator between dimensions, defaults to ","
 #' @export
+#' @importFrom stats xtabs
+#' @importFrom utils type.convert
 #' @examples
 #' X <- RV(1:6, 1/6)
 #' X3 <- iid(X, 3)
