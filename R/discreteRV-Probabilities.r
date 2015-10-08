@@ -117,16 +117,6 @@ RV <- function(outcomes, probs = NULL, odds = NULL, fractions = (class(probs) !=
         names(probs) <- outcomes
     }
     
-    if (length(grep(",", outcomes)) > 0) {
-        ord1 <- as.numeric(unlist(lapply(strsplit(outcomes, ","), '[[', 1)))
-        ord2 <- as.numeric(unlist(lapply(strsplit(outcomes, ","), '[[', 2)))
-        ord3 <- ord1 * length(unique(ord2)) + ord2
-        
-        outcomes <- outcomes[order(ord3)]
-        probs <- probs[order(ord3)]
-        names(probs) <- outcomes
-    }
-    
     class(outcomes) <- "RV"
     
     attr(outcomes, "probs") <- probs
@@ -394,8 +384,9 @@ probs <- function(X) {
 #' probs(d2)
 joint <- function(X, Y, sep=",", fractions = (attr(X, "fractions") & attr(Y, "fractions"))) {
     S <- X
+    myfac <- outer(S, Y, FUN="paste", sep=sep)
     tmp <- tapply(outer(probs(S), probs(Y), FUN="*"),
-                  outer(S, Y, FUN="paste", sep=sep), paste, sep=sep)
+                  factor(myfac, levels = myfac), paste, sep=sep)
     S <- names(tmp)
 
     return(RV(outcomes = as.character(S), probs = as.numeric(tmp), fractions = fractions))
@@ -717,7 +708,7 @@ margins <- function(X, sep=",") {
     
     res <- alply(dframe, .margins=1, function(x) {
         dtab <- xtabs(probs(X)~x)
-        my.rv <- RV(type.convert(names(dtab)), as.numeric(dtab))
+        my.rv <- RV(type.convert(names(dtab), as.is = TRUE), as.numeric(dtab))
         attr(my.rv, "joint") <- X
         my.rv
     })   

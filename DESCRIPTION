@@ -1,6 +1,6 @@
 Package: discreteRV
 Title: Create and Manipulate Discrete Random Variables
-Version: 1.2.2
+Version: 1.2.2.9000
 Authors@R: c(
     person("Andreas", "Buja", email = "buja.at.wharton@gmail.com", role = "aut"),
     person("Eric", "Hare", email = "erichare@iastate.edu", role = c("aut", "cre")),
