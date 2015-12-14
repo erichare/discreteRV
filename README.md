@@ -1,6 +1,9 @@
 ## discreteRV
 # R Package for easy generation of Discrete Random Variables
 
+[![CRAN Status](http://www.r-pkg.org/badges/version/discreteRV)](http://cran.r-project.org/package=discreteRV)
+[![CRAN RStudio mirror downloads](http://cranlogs.r-pkg.org/badges/discreteRV)](http://www.r-pkg.org/pkg/discreteRV)
+
 # INSTALLATION
 
 The latest stable release is available on CRAN, and can be loaded by calling install.packages("discreteRV").  If you would like to install the current revision on GitHub, please follow these instructions:
