@@ -554,9 +554,9 @@ SofI <- function(..., fractions=attr(list(...)[[1]], "fractions")) {
 #' 
 #' S5 <- SofIID(X.Bern, 5)
 #' S128 <- SofIID(X.Bern, 128)
-SofIID <- function(X, n=2, progress=TRUE, fractions=attr(X, "fractions")) {
+SofIID <- function(X, n = 2, progress = TRUE, fractions = attr(X, "fractions")) {
     S <- X;  i <- 2
-    pb <- txtProgressBar(min = 1, max = n)
+    if (progress) pb <- txtProgressBar(min = 1, max = n)
     while(i<=n) {
         tmp <- tapply(outer(probs(S), probs(X), FUN="*"),
                       outer(as.numeric(outcomes(S)), as.numeric(outcomes(X)), FUN="+"), sum)
@@ -564,10 +564,10 @@ SofIID <- function(X, n=2, progress=TRUE, fractions=attr(X, "fractions")) {
         S <- as.numeric(names(tmp))  
         attr(S, "probs") <- tmp
         
-        if(i%%100==0 & progress) setTxtProgressBar(pb, i)
+        if(i%%100==0 && progress) setTxtProgressBar(pb, i)
         i <- i+1
     };
-    close(pb)
+    if (progress) close(pb)
     
     return(RV(as.numeric(S), attr(S, "probs"), id = attr(X, "id"), fractions = fractions))
 }
