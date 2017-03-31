@@ -26,4 +26,3 @@ X.loaded.die.sim100 <- rsim(X.loaded.die, 100)
 as.vector(X.Bern.sim100)
 as.vector(X.loaded.die.sim100)
 }
-

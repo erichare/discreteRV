@@ -22,4 +22,3 @@ margins(X3)
 \author{
 Heike Hofmann \email{hofmann@iastate.edu}
 }
-

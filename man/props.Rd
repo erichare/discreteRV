@@ -26,4 +26,3 @@ props(X.loaded.die.sim100)
 #       By the LLN the results of 'props()' will be close to 'probs()' for
 #       for large simulations.
 }
-

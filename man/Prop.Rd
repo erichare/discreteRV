@@ -20,4 +20,3 @@ Prop(X.sim>0)
 Prop(X.sim==100000)
 Prop(X.sim==2000)
 }
-

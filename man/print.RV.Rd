@@ -30,4 +30,3 @@ print(fair.die)
 \author{
 Eric Hare \email{erichare@iastate.edu}
 }
-

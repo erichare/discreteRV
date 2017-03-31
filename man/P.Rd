@@ -20,4 +20,3 @@ X.loaded.die <- RV(1:6, odds = c(1,1,1,1,2,4))
 P(X.loaded.die>3)
 P(X.loaded.die==6)
 }
-

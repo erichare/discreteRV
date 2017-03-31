@@ -27,4 +27,3 @@ probs(d2)
 \author{
 Heike Hofmann \email{hofmann@iastate.edu}
 }
-

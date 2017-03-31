@@ -25,4 +25,3 @@ probs(X.fair.die)
 X.loaded.die <- RV(1:6, odds = c(1,1,1,1,2,4))
 probs(X.loaded.die)
 }
-

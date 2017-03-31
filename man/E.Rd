@@ -19,4 +19,3 @@ E(X.Bern)
 X.fair.die <- RV(1:6, rep(1/6,6))
 E(X.fair.die)
 }
-

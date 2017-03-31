@@ -27,4 +27,3 @@ independent(C, D) # FALSE
 \author{
 Eric Hare \email{erichare@iastate.edu}
 }
-

@@ -33,4 +33,3 @@ Plot a random variable of class "RV"
 fair.die <- RV(1:6, rep(1/6,6))
 plot(fair.die)
 }
-

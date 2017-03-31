@@ -22,4 +22,3 @@ marginal(AandB, 2)
 \author{
 Eric Hare \email{erichare@iastate.edu}
 }
-

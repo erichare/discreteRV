@@ -59,4 +59,3 @@ X.pois <- RV(c(0, Inf), pois.func, lambda = 5)
 # An equivalent method
 X.pois <- RV("poisson")
 }
-

@@ -18,4 +18,3 @@ X.sim <- rsim(X, 200000)
 
 skewSim(X.sim)
 }
-

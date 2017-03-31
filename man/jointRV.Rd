@@ -19,4 +19,3 @@ An RV object
 \description{
 Make a joint random variable consisting
 }
-

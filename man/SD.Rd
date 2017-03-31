@@ -16,4 +16,3 @@ Standard deviation of a random variable
 X.Bern <- RV(c(1,0), c(.5,.5))
 E(X.Bern)
 }
-

@@ -17,4 +17,3 @@ A logical vector indicating which elements of e1 are in e2
 \description{
 Generic method for in operator function
 }
-

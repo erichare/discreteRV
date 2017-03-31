@@ -20,4 +20,3 @@ X.sim <- rsim(X, 200000)
 
 plot(X.sim)
 }
-

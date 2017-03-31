@@ -24,4 +24,3 @@ X.Bern <- RV(c(1,0), c(.5,.5))
 S5 <- SofIID(X.Bern, 5)
 S128 <- SofIID(X.Bern, 128)
 }
-

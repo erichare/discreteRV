@@ -16,4 +16,3 @@ Kurtosis of a random variable
 X.Bern <- RV(c(1,0), c(.5,.5))
 KURT(X.Bern)
 }
-

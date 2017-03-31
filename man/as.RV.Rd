@@ -16,4 +16,3 @@ as.RV(px, fractions = TRUE)
 Turn a probability vector with possible outcome values in the 'names()' attribute
 into a random variable:
 }
-
